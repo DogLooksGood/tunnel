@@ -1,0 +1,54 @@
+* 目录结构
+#+BEGIN_EXAMPLE
+  .
+  ├── README.org
+  ├── dev-resources
+  ├── env
+  │   ├── dev
+  │   │   └── datomic.clj  开发环境用的datomic组件
+  │   └── user.clj         REPL初始化
+  ├── project.clj
+  ├── resources
+  │   ├── data
+  │   │   ├── initial.edn  开发环境初始化数据
+  │   │   └── schema.edn   开发环境初始化表结构
+  │   └── public
+  │       ├── css
+  │       │   └── normalize.css  样式统一
+  │       └── js
+  ├── src
+  │   ├── client 客户端
+  │   │   └── tunnel
+  │   │       ├── core.cljs  
+  │   │       └── style.cljs  用Garden写样式.
+  │   ├── server 服务器端
+  │   │   └── tunnel
+  │   │       ├── core.clj
+  │   │       └── system.clj  组件管理
+  │   └── shared 共享
+  └── test 测试
+      └── tunnel
+#+END_EXAMPLE
+
+* 如何启动
+** ~cider-jack-in~ 启动REPL
+** 启动, 重启, 停止所有组件
+#+BEGIN_SRC clojure
+  ;; 启动
+  (go)
+
+  ;; 重启
+  (reset)
+
+  ;; 停止
+  (stop)
+#+END_SRC
+** CLJ和CLJS的REPL切换
+#+BEGIN_SRC clojure
+  ;; CLJ->CLJS
+  (in-ns 'user)
+  (cljs-repl)
+
+  ;; CLJS->CLJ
+  :cljs/quit
+#+END_SRC
