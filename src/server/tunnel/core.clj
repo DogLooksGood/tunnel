@@ -1,5 +1,6 @@
 (ns tunnel.core
   (:require [hiccup.core :as html :refer [html]]
+            [reloaded.repl :refer [system]]
             [hiccup.page :refer [include-js include-css]]
             [ring.middleware
              [session]
@@ -17,7 +18,9 @@
      (include-js "js/compiled/tunnel.js")]))
 
 (defroutes route
-  (GET "/" req index-page))
+  (GET "/" req index-page)
+  (GET "/chsk" req ((-> system :sente :ring-ajax-get-or-ws-handshake) req))
+  (POST "/chsk" req ((-> system :sente :ring-ajax-post) req)))
 
 (def handler (-> #'route
                ring.middleware.keyword-params/wrap-keyword-params

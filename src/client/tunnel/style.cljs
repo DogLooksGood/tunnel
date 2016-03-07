@@ -14,7 +14,7 @@
 ;; 测试
 (def ^:const global
   [:body {:background-color "#398093"
-          :fond {:family "Comic Sans MS"
+          :font {:family "Comic Sans MS"
                  :size (px 25)}}])
 
 (def root

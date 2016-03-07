@@ -1,5 +1,6 @@
 (ns tunnel.core
   (:require [tunnel.style]              ; 加载样式
+            [tunnel.socket]             ; 初始化websocket
             [reagent.core :as r]
             [goog.dom :as gdom]))
 
@@ -16,3 +17,4 @@
 (r/render-component
   [hello-world]
   (gdom/getElement "app"))
+
