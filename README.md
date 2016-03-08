@@ -1,5 +1,5 @@
 # 如何启动
-## ~cider-jack-in~ 启动REPL
+## `cider-jack-in` 启动REPL
 ## 启动, 重启, 停止所有组件
 ```clojure
   ;; 启动
