@@ -36,3 +36,13 @@
             (not= x-item y-item) (recur (rest ks) (update delta :update assoc k y-item))
             :else (recur (rest ks) delta)))))))
 
+(defn join
+  "把变化应用在一个列表上,获得变化之后的列表."
+  [x delta]
+  (let [{:keys [key add update remove]} delta]
+    (->> x
+      (filter #(not (contains? remove (get % key))))
+      (map #(get update (get % key) %))
+      (lazy-cat add)
+      dedupe
+      vec)))

@@ -6,7 +6,9 @@
    [cljs.core.async :as async :refer (<! >! put! chan)]
    [taoensso.sente  :as sente :refer (cb-success?)]))
 
-;;; Add this: --->
+
+;; =============================================================================
+;; WebSocket Init
 (let [{:keys [chsk ch-recv send-fn state]}
       (sente/make-channel-socket! "/chsk"
         {:type :auto                    ; e/o #{:auto :ajax :ws}
