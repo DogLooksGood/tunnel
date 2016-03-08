@@ -4,6 +4,12 @@
             [taoensso.timbre :refer [debug spy error]]))
 
 ;; =============================================================================
+;; Dynamic
+(def ^:dynamic *session* nil)
+(def ^:dynamic *cookie* nil)
+(def ^:dynamic *request* nil)
+
+;; =============================================================================
 ;; Helpers
 
 (defn gen-token
@@ -15,28 +21,31 @@
 
 (defmulti api-handler
   "处理HTTP的API请求"
-  (fn [key params ring-req]
-    key))
+  (fn [key params] key))
 
 ;; 用户登陆
 (defmethod api-handler :login
-  [key params ring-req]
+  [_ params]
   (let [{:keys [username password]} params
-        user (service/user-login? username password)]
+        user (service/user-login username password)]
     (merge (redirect "/")
       {:session {:uid (:db/id user)
                  :token (gen-token)}})))
+
+
 
 (defn api-handler*
   "入口函数, 简易处理
   TODO 实现异常处理和跳转"
   [ring-req]
   (try
-    (debug ring-req)
     (let [params* (:params ring-req)
           key (keyword (:key params*))
           params (dissoc params* :key)]
-      (api-handler key params ring-req))
+      (binding [*request* ring-req
+                *session* (:session ring-req)
+                *cookie* (:cookie ring-req)]
+        (api-handler key params)))
     (catch clojure.lang.ExceptionInfo ex
       {:body (.getMessage ex)
        :headers {"Content-Type" "text/html"}
@@ -47,14 +56,15 @@
 
 (defmulti event-msg-handler
   "处理WebSocket的事件"
-  (fn [ev-id ev-msg ring-req ?reply-fn]
+  (fn [ev-id ev-msg ?reply-fn]
     ev-id))
 
 (defmethod event-msg-handler :default
-  [ev-id ev-msg _ _]
+  [ev-id ev-msg ?reply-fn]
   #_(prn ev-id ev-msg))
 
 (defn event-msg-handler*
   "入口函数, 简易处理"
   [{:keys [event ring-req ?reply-fn]}]
-  (event-msg-handler (first event) (second event) ring-req ?reply-fn))
+  (binding [*request* ring-req]
+    (event-msg-handler (first event) (second event) ?reply-fn)))

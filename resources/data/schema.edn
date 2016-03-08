@@ -20,5 +20,12 @@
   :db/cardinality :db.cardinality/one
   :db/doc "用户当前状态, 在线:online, 离线:offline, 忙碌:busy等"
   :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :user/token
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc "用户登陆的token, 每次登录时系统生成."
+  :db.install/_attribute :db.part/db}
  
  ]

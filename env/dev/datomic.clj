@@ -17,6 +17,7 @@
       @(d/transact c initial-data)
       (assoc component :connection c)))
   (stop [component]
+    (d/delete-database uri)
     (assoc component :connection nil)))
 
 (defn new-database [db-uri]

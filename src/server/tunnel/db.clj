@@ -10,9 +10,13 @@
   (fn [key selector params]
     key))
 
-(defmethod query :user-login
+(defmulti mutate
+  (fn [key params]
+    key))
+
+(defmethod query :user/login
   [key selector params]
-  (let [{:keys [username password]} params]
+  (let [{:keys [user/username user/password]} params]
     (with-conn conn
       (d/q '[:find (pull ?e selector) .
              :in $ selector ?u ?p
@@ -20,3 +24,10 @@
              [?e :user/username ?u]
              [?e :user/password ?p]]
         (d/db conn) selector username password))))
+
+(defmethod mutate :user/set-status
+  [key params]
+  (let [{:keys [user/status db/id]} params]
+    (with-conn conn
+      @(d/transact conn
+         [[:db/add id :user/status :online]]))))
