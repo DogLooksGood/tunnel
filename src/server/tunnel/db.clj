@@ -60,3 +60,10 @@
       @(d/transact conn
          [[:db/add id :user/status :online]]))))
 
+(defmethod mutate :user/add-tag
+  [key params]
+  (let [{:keys [db/id user/tags]} params]
+    (with-conn conn
+      @(d/transact conn
+         (mapv #(do [:db/add id :user/tags %]) tags)))))
+

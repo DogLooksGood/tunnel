@@ -1,0 +1,93 @@
+* 约定
+query: [key selector params]
+sub: 订阅
+pub: 发行
+
+* 需求, 各功能需要跑通
+** 客户端 [2/5]
+- [ ] UI组件声明从本地atom查询数据, 查看哪一类用户
+- [ ] UI组件声明从服务器fetch数据, 获取用户列表
+- [X] UI组件声明从服务器订阅数据, 获取用户列表的变化
+- [X] **Sente发送事件的CSRF Token
+- [ ] 简单的用户列表, 可以收到用户关系变化的影响.
+** 服务器 [3/5]
+- [ ] 服务器接受客户端的fetch请求, 查询返回数据
+  客户端的fetch请求会从WebSocket发送过来, 在Sente的
+  event-msg-handler中来处理.
+- [X] 服务器订阅的注册, 订阅用户列表变化
+- [X] 服务器订阅的注销, 注销订阅用户列表变化
+- [X] 各种查询和订阅, 在服务器的保存.
+- [ ] 监听Datomic TX的处理.
+
+* Fetch和Sub的查询语句的区别
+** fetch
+#+BEGIN_SRC clojure
+  (d/q '[:find [(pull ?e [*]) ...]
+         :in $ ?n
+         :where [?e :user/username ?n]]
+    (d/db conn) "dog")
+#+END_SRC
+
+** sub
+#+BEGIN_SRC clojure
+  (d/q '[:find [(pull ?e [*]) ...]
+         :in $ $tx-data ?n
+         :where
+         (or ;; 这里可能有多个entity, 只要有一个就满足
+           [$tx-data ?e])
+         [?e :user/username ?n]]
+    db-before tx-data "dog")
+    ;; db-before 查一次, db-after 查一次
+#+END_SRC
+
+* 订阅的逻辑
+** 多个人订阅同样一个查询的时候如何处理?
+key + selector + params => #{uid}
+这个规则考虑实现在内存atom. 利于开发.
+需要支持从查询到uid, 从uid到查询, 和枚举所有查询.
+
+/由于一个查询可能根据params的不同, 具有时效性.
+ 比如带有时间范围, 所以当没有任何订阅的时候, 查询应该被删除./
+
+查询的签名如下:
+#+BEGIN_SRC clojure
+  (defmulti query
+    (fn [key selector params]
+      key))
+#+END_SRC
+
+服务器端订阅查询的签名如下:
+#+BEGIN_SRC clojure
+  (defn register-sub
+    "注册一个客户端`uid`, 
+    针对一个查询`key+selector+params`的订阅."
+    [uid key selector params])
+#+END_SRC
+
+** 一个客户端重复订阅同样的查询如何区分?
+对于数据A, 每一个声明A的组件加载的时候, 就+1, 
+每一个卸载的时候-1. 
+
+从0->1 向服务器发送订阅, 从1->0向服务器发送取消订阅.
+socket断开取消uid对应所有订阅.
+
+客户端订阅查询的签名如下:
+#+BEGIN_SRC clojure
+  (defn register-remote-sub
+    "订阅一个远程的查询"
+    [key selector params])
+#+END_SRC
+
+*** 例子
+订阅从现在开始10分钟内的事件
+key: xx/event 
+selector: [*]
+params: start-time 12:19 endtime 12:29
+
+*要保存*
+key + selector + params => set(订阅了此查询的所有uid)
+
+** WAIT 怎么从 tx-report-queue的回调中做发行的操作?
+- State "WAIT"       from              [2016-03-09 Wed 00:25] \\
+  先不考虑
+

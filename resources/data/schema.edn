@@ -27,5 +27,44 @@
   :db/cardinality :db.cardinality/one
   :db/doc "用户登陆的token, 每次登录时系统生成."
   :db.install/_attribute :db.part/db}
+
+ ;; User Tags
+ {:db/id #db/id [:db.part/db]
+  :db/ident :user/tags
+  :db/valueType :db.type/keyword
+  :db/cardinality :db.cardinality/many
+  :db/doc "用户的标签, 一个用户可以对应多个标签."
+  :db.install/_attribute :db.part/db}
+
+ ;; User Relationship
+ {:db/id #db/id [:db.part/db]
+  :db/ident :user/blacklist
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/many
+  :db/doc "用户的黑名单, ref指向其他用户的entity-id"
+  :db.install/_attribute :db.part/db}
+ 
+ {:db/id #db/id [:db.part/db]
+  :db/ident :user/friends
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/many
+  :db/doc "用户的好友, ref指向其他用户的entity-id"
+  :db.install/_attribute :db.part/db}
+ 
+ {:db/id #db/id [:db.part/db]
+  :db/ident :user/whitelist
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/many
+  :db/doc "用户的白名单, ref指向其他用户的entity-id"
+  :db.install/_attribute :db.part/db}
+ 
+ ;; Template
+ (comment
+   {:db/id #db/id [:db.part/db]
+    :db/ident 
+    :db/valueType :db.type/
+    :db/cardinality :db.cardinality/
+    :db/doc ""
+    :db.install/_attribute :db.part/db})
  
  ]

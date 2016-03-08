@@ -3,7 +3,8 @@
  {:db/id #db/id [:db.part/user]
   :user/username "dog"
   :user/password "123"
-  :user/status :offline}
+  :user/status :offline
+  :user/tags [:IT :BiliBili :abc]}
  
  {:db/id #db/id [:db.part/user]
   :user/username "cat"
