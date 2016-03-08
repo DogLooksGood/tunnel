@@ -11,6 +11,7 @@
                  [org.clojure/core.async "0.2.374"
                   :exclusions [org.clojure/tools.reader]]
                  [ring "1.4.0"]
+                 [ring/ring-defaults "0.1.5"]
                  [hiccup "1.0.5"]
                  [com.taoensso/sente "1.8.1"]
                  [org.danielsz/system "0.2.0"]
@@ -51,6 +52,6 @@
 
   :figwheel {:http-server-root "public"
              ;; :css-dirs ["resources/public/css"]
-             :ring-handler tunnel.core/handler
+             :ring-handler tunnel.core/ring-handler
              :server-logfile "/tmp/figwheel-logfile.log"
              })

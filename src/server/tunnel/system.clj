@@ -5,10 +5,11 @@
              :refer (sente-web-server-adapter)]
             [system.components
              [sente :refer [new-channel-sockets]]]
-            [system.core :refer [defsystem]]))
+            [system.core :refer [defsystem]]
+            [tunnel.handler :as hdlr]))
 
 ;; 先只写一个测试环境的.
 (defsystem dev-system
-  [:sente (new-channel-sockets #(prn %) sente-web-server-adapter) ; #(prn %) 这里换自定义的event-msg-handler [event]
+  [:sente (new-channel-sockets hdlr/event-msg-handler* sente-web-server-adapter)
    :figwheel-system (sys/figwheel-system (sys/fetch-config))
    :datomic (new-database  "datomic:mem://localhost:4334/test")])

@@ -1,1 +1,24 @@
-[]
+[
+ ;; User
+ {:db/id #db/id [:db.part/db]
+  :db/ident :user/username
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc "用户名"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :user/password
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc "用户密码, 为了测试方便, 先不加密 TODO 密码加密"
+  :db.install/_attribute :db.part/db}
+ 
+ {:db/id #db/id [:db.part/db]
+  :db/ident :user/status
+  :db/valueType :db.type/keyword
+  :db/cardinality :db.cardinality/one
+  :db/doc "用户当前状态, 在线:online, 离线:offline, 忙碌:busy等"
+  :db.install/_attribute :db.part/db}
+ 
+ ]

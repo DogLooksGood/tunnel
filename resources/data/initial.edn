@@ -1,1 +1,12 @@
-[]
+[
+ ;; Users
+ {:db/id #db/id [:db.part/user]
+  :user/username "dog"
+  :user/password "123"
+  :user/status :offline}
+ 
+ {:db/id #db/id [:db.part/user]
+  :user/username "cat"
+  :user/password "321"
+  :user/status :offline}
+ ]

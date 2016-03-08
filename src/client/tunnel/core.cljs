@@ -1,6 +1,6 @@
 (ns tunnel.core
-  (:require [tunnel.style]              ; 加载样式
-            [tunnel.socket]             ; 初始化websocket
+  (:require [tunnel.socket]             ; 初始化websocket
+            [tunnel.style]              ; 加载样式
             [reagent.core :as r]
             [goog.dom :as gdom]))
 
