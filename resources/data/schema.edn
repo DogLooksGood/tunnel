@@ -58,13 +58,4 @@
   :db/doc "用户的白名单, ref指向其他用户的entity-id"
   :db.install/_attribute :db.part/db}
  
- ;; Template
- (comment
-   {:db/id #db/id [:db.part/db]
-    :db/ident 
-    :db/valueType :db.type/
-    :db/cardinality :db.cardinality/
-    :db/doc ""
-    :db.install/_attribute :db.part/db})
- 
  ]
