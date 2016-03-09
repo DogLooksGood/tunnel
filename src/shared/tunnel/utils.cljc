@@ -46,3 +46,36 @@
       (lazy-cat add)
       dedupe
       vec)))
+
+;; bi-directional map
+;; http://stackoverflow.com/questions/1183232/a-bi-directional-map-in-clojure
+(defn bimap [& args]
+  (let [m (apply hash-map args)]
+    (with-meta m
+      (clojure.set/map-invert m))))
+
+(defn bi-assoc
+  [m k v]
+  (vary-meta (assoc m k v)
+    assoc v k))
+
+(defn bi-dissoc
+  [m k]
+  (vary-meta (dissoc m k)
+    (dissoc k)))
+
+(defn get-invert
+  [m k]
+  ((meta m) k))
+
+;; http://stackoverflow.com/questions/14488150/how-to-write-a-dissoc-in-command-for-clojure
+(defn dissoc-in
+  [m [k & ks :as keys]]
+  (if ks
+    (if-let [nextmap (get m k)]
+      (let [newmap (dissoc-in nextmap ks)]
+        (if (seq newmap)
+          (assoc m k newmap)
+          (dissoc m k)))
+      m)
+    (dissoc m k)))
