@@ -1,6 +1,6 @@
 (ns tunnel.core
   (:require [tunnel.socket :as socket]             ; 初始化websocket
-            [tunnel.style]              ; 加载样式
+            [tunnel.style.screen]                  ; 加载样式
             [reagent.core :as r]
             [goog.dom :as gdom]))
 
@@ -12,7 +12,7 @@
 
 (defn hello-world
   []
-  [:div [:h1 "Hello, World!"]
+  [:div [:div "Hello, World!"]
    [:button {:on-click #(socket/send! [:user/fetch {:key :user/list-all
                                                     :selector '[*]
                                                     :params {}}])}

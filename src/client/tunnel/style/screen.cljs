@@ -1,5 +1,6 @@
-(ns tunnel.style
-  (:require [goog.style :as gs]
+(ns tunnel.style.screen
+  (:require [tunnel.style.normalize :refer [normalize]]
+            [goog.style :as gs]
             [garden.core :refer [css]]
             [garden.units :refer [px]]))
 
@@ -8,7 +9,8 @@
 (defonce style (atom nil))
 
 (when-not (nil? @style)
-  (gs/uninstallStyles @style)
+  (doseq [s @style]
+    (gs/uninstallStyles s))
   (reset! style nil))
 
 ;; 测试
@@ -20,4 +22,5 @@
 (def root
   `[~@global])
 
-(reset! style (gs/installStyles (css root)))
+(reset! style [(gs/installStyles (css normalize))
+               (gs/installStyles (css root))])

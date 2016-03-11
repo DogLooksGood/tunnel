@@ -19,8 +19,7 @@
 (defn index-page
   [req]
   (html
-    [:head
-     (include-css "css/normalize.css")]
+    [:head]
     [:body
      [:div#app]
      (include-js "js/compiled/tunnel.js")]))
