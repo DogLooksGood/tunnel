@@ -26,12 +26,11 @@
 (defmulti event-msg-handler
   (fn [ev-id ev-msg] ev-id))
 
-(defn send-ev!
+(defn send!
   [ev]
   (put! ch-ev ev))
 
-
-;; (send-ev! [:msg/test {:text "hello, world"}])
+;; (send! [:msg/test {:text "hello, world"}])
 
 (defn consume-ch-ev
   "消费ch-ev中的事件,
@@ -39,7 +38,7 @@
   []
   (go-loop []
     (let [ev (<! ch-ev)]
-      (chsk-send! ev)
+      (chsk-send! ev 1000 prn)
       (recur))))
 
 (defmethod event-msg-handler :chsk/state
@@ -49,7 +48,8 @@
       (consume-ch-ev))))
 
 (defmethod event-msg-handler :default
-  [_ _])
+  [ev-id ev-msg]
+  (prn ev-id ev-msg))
 
 (defn event-msg-handler*
   [{:keys [event]}]

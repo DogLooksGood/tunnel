@@ -31,10 +31,21 @@
               y-item (get y k)
               x-item (get x k)]
           (cond
-            (and in-y (not in-x)) (recur (rest ks) (update delta :add conj y-item))
-            (and in-x (not in-y)) (recur (rest ks) (update delta :remove conj k))
-            (not= x-item y-item) (recur (rest ks) (update delta :update assoc k y-item))
+            (and in-y (not in-x))
+            (recur (rest ks) (update delta :add conj y-item))
+            (and in-x (not in-y))
+            (recur (rest ks) (update delta :remove conj k))
+            (not= x-item y-item)
+            (recur (rest ks) (update delta :update assoc k y-item))
             :else (recur (rest ks) delta)))))))
+
+(defn delta?
+  [delta]
+  (not
+    (and
+      (empty? (:remove delta))
+      (empty? (:update delta))
+      (empty? (:add delta)))))
 
 (defn join
   "把变化应用在一个列表上,获得变化之后的列表."

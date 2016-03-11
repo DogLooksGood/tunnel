@@ -1,5 +1,7 @@
 (ns tunnel.handler
   (:require [tunnel.service :as service]
+            [tunnel.subs :as subs]
+            [tunnel.db :as db]
             [ring.util.response :refer [response redirect]]
             [taoensso.timbre :refer [debug spy error]]))
 
@@ -55,17 +57,42 @@
 ;; =============================================================================
 ;; Event Handler
 
+;; 常用的事件类型
+;; :user/command         {:key :params}              发送命令
+;; :user/fetch           {:key :selector :params}    查询数据
+;; :user/register-sub    {:key :selector :params}    注册订阅
+;; :user/unregister-sub  {:key :selector :params}    注销订阅
+
 (defmulti event-msg-handler
   "处理WebSocket的事件"
-  (fn [ev-id ev-msg ?reply-fn]
+  (fn [uid ev-id ev-msg ?reply-fn]
     ev-id))
 
+(defmethod event-msg-handler :user/command
+  [uid ev-id ev-msg ?reply-fn])
+
+(defmethod event-msg-handler :user/fetch
+  [uid ev-id {:keys [key selector params]} ?reply-fn]
+  {:value (db/query key selector params)})
+
+(defmethod event-msg-handler :user/register-sub
+  [uid ev-id {:keys [key selector params]} ?reply-fn]
+  (subs/register-sub uid key selector params))
+
+(defmethod event-msg-handler :user/unregister-sub
+  [uid ev-id ev-msg ?reply-fn])
+
+(defmethod event-msg-handler :chsk/uidport-close
+  [uid _ _ _]
+  (subs/unregister-all-subs uid))
+
 (defmethod event-msg-handler :default
-  [ev-id ev-msg ?reply-fn]
-  #_(prn ev-id ev-msg))
+  [uid ev-id ev-msg ?reply-fn])
 
 (defn event-msg-handler*
   "入口函数, 简易处理"
-  [{:keys [event ring-req ?reply-fn]}]
+  [{:keys [event ring-req uid ?reply-fn]}]
   (binding [*request* ring-req]
-    (event-msg-handler (first event) (second event) ?reply-fn)))
+    (let [reply (event-msg-handler uid (first event) (second event) ?reply-fn)]
+      (when ?reply-fn
+        ?reply-fn reply))))
