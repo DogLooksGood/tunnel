@@ -1,0 +1,25 @@
+* 开发中, 还不能使用:(
+
+* 如何运行
+** 使用 ~cider-jack-in~ 启动REPL
+** 启动, 重启, 停止所有组件
+#+BEGIN_SRC clojure
+  ;; 启动
+  (go)
+
+  ;; 重启
+  (reset)
+
+  ;; 停止
+  (stop)
+#+END_SRC
+
+** 如何切换CLJ和CLJS的REPL.
+#+BEGIN_SRC clojure
+  ;; CLJ -> CLJS
+  (in-ns 'user)
+  (cljs-repl)
+
+  ;; CLJS -> CLJ
+  :cljs/quit
+#+END_SRC
