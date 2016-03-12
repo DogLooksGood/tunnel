@@ -9,14 +9,14 @@
   `(let [~conn (d/connect "datomic:mem://localhost:4334/test")]
      (do ~@exprs)))
 
+;; 直接查询返回查询结果.
 (defmulti query
   (fn [key selector params]
     key))
 
 ;; 传入tx-data限定entity范围的查询.
-(defmulti updates
+(defmulti scoped-query
   (fn [key selector params db tx-data]
-    (debug "updates: " key)
     key))
 
 (defmulti mutate
@@ -72,8 +72,8 @@
   (let [db-before (:db-before tx)
         db-after (:db-after tx)
         tx-data (:tx-data tx)
-        before (updates key selector params db-before tx-data)
-        after (updates key selector params db-after tx-data)]
+        before (scoped-query key selector params db-before tx-data)
+        after (scoped-query key selector params db-after tx-data)]
     (utils/diff :db/id before after)))
 
 ;; =============================================================================
@@ -99,7 +99,7 @@
            [?e :user/username]]
       (d/db conn) selector)))
 
-(defmethod updates :user/list-all
+(defmethod scoped-query :user/list-all
   [key selector params db tx-data]
   (with-conn conn
     (d/q '[:find [(pull ?e selector) ...]
@@ -136,7 +136,7 @@
              [?uid :user/friends ?f]]
         (d/db conn) selector id))))
 
-(defmethod updates :user/friend-list
+(defmethod scoped-query :user/friend-list
   [key selector params db tx-data]
   (let [{:keys [db/id]} params]
     (d/q '[:find [(pull ?f selector) ...]

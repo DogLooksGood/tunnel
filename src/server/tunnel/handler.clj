@@ -20,6 +20,7 @@
 
 ;; =============================================================================
 ;; API Handler
+;; TODO 重构一个独立的模块.
 
 (defmulti api-handler
   "处理HTTP的API请求"
@@ -57,7 +58,7 @@
 ;; =============================================================================
 ;; Event Handler
 
-;; 常用的事件类型
+;; 事件类型
 ;; :user/command         {:key :params}              发送命令
 ;; :user/fetch           {:key :selector :params}    查询数据
 ;; :user/register-sub    {:key :selector :params}    注册订阅
@@ -65,34 +66,38 @@
 
 (defmulti event-msg-handler
   "处理WebSocket的事件"
-  (fn [uid ev-id ev-msg ?reply-fn]
+  (fn [uid ev-id ev-msg]
     ev-id))
 
 (defmethod event-msg-handler :user/command
-  [uid ev-id ev-msg ?reply-fn])
+  [uid ev-id ev-msg])
 
 (defmethod event-msg-handler :user/fetch
-  [uid ev-id {:keys [key selector params]} ?reply-fn]
+  [uid ev-id [key selector params]]
   {:value (db/query key selector params)})
 
 (defmethod event-msg-handler :user/register-sub
-  [uid ev-id {:keys [key selector params]} ?reply-fn]
-  (subs/register-sub uid key selector params))
+  [uid ev-id [key selector params]]
+  (subs/register-sub uid key selector params)
+  {:status :ok})
 
 (defmethod event-msg-handler :user/unregister-sub
-  [uid ev-id ev-msg ?reply-fn])
+  [uid ev-id [key selector params]]
+  (subs/unregister-sub uid key selector params)
+  {:status :ok})
 
+;; 用户websocket断开时, 结束所有uid相关的订阅.
 (defmethod event-msg-handler :chsk/uidport-close
-  [uid _ _ _]
+  [uid ev-id _]
   (subs/unregister-all-subs uid))
 
 (defmethod event-msg-handler :default
-  [uid ev-id ev-msg ?reply-fn])
+  [uid ev-id ev-msg])
 
 (defn event-msg-handler*
-  "入口函数, 简易处理"
+  "入口函数, 简易处理. 如果有?reply-fn就返回响应."
   [{:keys [event ring-req uid ?reply-fn]}]
   (binding [*request* ring-req]
-    (let [reply (event-msg-handler uid (first event) (second event) ?reply-fn)]
+    (let [reply (event-msg-handler uid (first event) (second event))]
       (when ?reply-fn
-        ?reply-fn reply))))
+        (?reply-fn reply)))))

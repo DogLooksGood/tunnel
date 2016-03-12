@@ -1,7 +1,8 @@
 (ns tunnel.socket
   "和websocket相关的代码."
   (:require-macros
-   [cljs.core.async.macros :as asyncm :refer (go go-loop)])
+   [cljs.core.async.macros :as asyncm :refer (go go-loop)]
+   [taoensso.timbre :refer [debug spy]])
   (:require
    [cljs.core.async :as async :refer (<! >! put! chan)]
    [taoensso.sente  :as sente :refer (cb-success?)]))
@@ -34,11 +35,12 @@
 
 (defn consume-ch-ev
   "消费ch-ev中的事件,
-  TODO 使用websocket发送给服务器."
+  TODO 处理回调函数."
   []
   (go-loop []
     (let [ev (<! ch-ev)]
-      (chsk-send! ev 1000 prn)
+      (debug "chsk-send: " ev)
+      (chsk-send! ev 1000 #(prn %))
       (recur))))
 
 (defmethod event-msg-handler :chsk/state

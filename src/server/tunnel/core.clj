@@ -51,6 +51,5 @@
                     ring.middleware.stacktrace/wrap-stacktrace
                     ))
 
-(comment
-  (org.httpkit.server/run-server ring-handler
-    {:port 3456}))
+#_(org.httpkit.server/run-server ring-handler
+  {:port 3456})
