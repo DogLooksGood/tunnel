@@ -7,9 +7,14 @@
    [cljs.core.async :as async :refer (<! >! put! chan)]
    [taoensso.sente  :as sente :refer (cb-success?)]))
 
+;; event channel, 在websocket连接成功之后开始消费.
+;; 由于UI会在页面加载的时候立刻开始渲染, 而websocket需要等待连接成功.
+;; 所以UI产生的需要websocket处理的事件统一发送到这个channel.
+(defonce ch-ev (chan))
 
 ;; =============================================================================
 ;; WebSocket Init
+
 (let [{:keys [chsk ch-recv send-fn state]}
       (sente/make-channel-socket! "/chsk"
         {:type :auto                    ; e/o #{:auto :ajax :ws}
@@ -18,11 +23,6 @@
   (def ch-chsk    ch-recv)
   (def chsk-send! send-fn)
   (def chsk-state state))
-
-;; event channel, 在websocket连接成功之后开始消费.
-;; 由于UI会在页面加载的时候立刻开始渲染, 而websocket需要等待连接成功.
-;; 所以UI产生的需要websocket处理的事件统一发送到这个channel.
-(defonce ch-ev (chan))
 
 (defmulti event-msg-handler
   (fn [ev-id ev-msg] ev-id))
@@ -48,6 +48,11 @@
   (let [{:keys [open? first-open?]} ev-msg]
     (when (and open? first-open?)
       (consume-ch-ev))))
+
+;; 服务器向客户端推送数据的事件.
+(defmethod event-msg-handler :system/pub
+  [ev-id ev-msg]
+  (prn ev-id ev-msg))
 
 (defmethod event-msg-handler :default
   [ev-id ev-msg]
