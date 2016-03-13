@@ -84,14 +84,13 @@
   [tx]
   (try
     (let [sub->uid* (sub->uid)]
-      (doseq [[[key selector params] uid-set] (spy sub->uid*)]
+      (doseq [[[key selector params :as expr] uid-set] (spy sub->uid*)]
         (let [delta (db/diff-result key selector params tx)
               send! (-> system :sente :chsk-send!)]
-          (spy delta)
           (when (utils/delta? delta)
             (doseq [uid uid-set]
-              (debug "SEND " delta " TO " uid " BY " send!)
-              (send! uid [:system/pub {:delta delta}]))))))
+              (send! uid [:system/pub {:delta delta
+                                       :expr expr}]))))))
     (catch Exception ex
       (error "Parse Error: " ex)))
   (debug "Parse TX finished."))

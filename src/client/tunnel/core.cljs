@@ -1,7 +1,8 @@
 (ns tunnel.core
   (:require [tunnel.socket :as socket]  ; 初始化websocket
             [tunnel.style.screen]       ; 加载样式
-            [tunnel.subs :as subs]
+            [tunnel.remote :as remote]
+            [tunnel.state :as state]
             [reagent.core :as r]
             [goog.dom :as gdom]))
 
@@ -11,37 +12,25 @@
 
 (defonce app-state (atom {:text "Hello world!"}))
 
-;; (defn hello-world
-;;   []
-;;   [:div [:div "Hello, World!"]
-;;    [:button {:on-click #(socket/send! [:user/fetch {:key :user/list-all
-;;                                                     :selector '[*]
-;;                                                     :params {}}])}
-;;     "Test Fetch!"]
-;;    [:button {:on-click #(socket/send! [:user/register-sub
-;;                                        {:key :user/list-all
-;;                                         :selector '[*]
-;;                                         :params {}}])}
-;;     "Test Sub"]])
-
+(def user-expr [:user/list-all '[*] {}])
 
 (def hello-world
   (r/create-class
     {:reagent-render
      (fn [{:keys [i]}]
-       [:div
-        [:button {:on-click ;; (subs/register-remote-sub :user/list-all '[*] {})
-                  #(socket/send! [:user/register-sub [:user/list-all '[*] {}]])}
-         "Click me!"]
-        i])
+       (let [user-list (state/remote user-expr)]
+         [:div
+          [:button {:on-click state/log-state}
+           "LOG"]
+          (for [user @user-list]
+            ^{:key (:db/id user)} [:div (:user/username user)])
+          i]))
      :component-will-mount
      (fn [this]
-       (prn "props" (r/props this))
-       (subs/register-remote-sub :user/list-all '[*] {}))
+       (remote/fetch-and-register user-expr))
      :component-will-unmount
      (fn [this]
-       (prn (r/props this))
-       (subs/unregister-remote-sub :user/list-all '[*] {}))}))
+       (remote/unregister-remote-sub user-expr))}))
 
 (r/render-component
   [hello-world {:i 10}]

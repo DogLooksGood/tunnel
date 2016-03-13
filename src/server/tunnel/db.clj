@@ -153,8 +153,10 @@
   (with-conn conn
     @(d/transact conn
        [{:db/id #db/id [:db.part/user]
-         :user/username "abdc13"
+         :user/username "狗好看"
          :user/password "321"
          :user/status :offline}]))
 
-  )
+  (with-conn conn
+    @(d/transact conn
+       [[:db/retract 17592186045427 :user/username "狗好看"]])))

@@ -73,18 +73,28 @@
   [uid ev-id ev-msg])
 
 (defmethod event-msg-handler :user/fetch
-  [uid ev-id [key selector params]]
-  {:value (db/query key selector params)})
+  [uid ev-id [key selector params :as expr]]
+  {:value (db/query key selector params)
+   :expr expr})
 
 (defmethod event-msg-handler :user/register-sub
   [uid ev-id [key selector params]]
   (subs/register-sub uid key selector params)
-  {:status :ok})
+  {})
+
+;; 先注册, 然后再查询.
+;; TODO 这个实现应该有并发问题, 待解决
+(defmethod event-msg-handler :user/fetch-and-register
+  [uid ev-id [key selector params :as expr]]
+  (debug "fetch and register" key selector params)
+  (subs/register-sub uid key selector params)
+  {:value (db/query key selector params)
+   :expr expr})
 
 (defmethod event-msg-handler :user/unregister-sub
   [uid ev-id [key selector params]]
   (subs/unregister-sub uid key selector params)
-  {:status :ok})
+  {})
 
 ;; 用户websocket断开时, 结束所有uid相关的订阅.
 (defmethod event-msg-handler :chsk/uidport-close
@@ -98,6 +108,7 @@
   "入口函数, 简易处理. 如果有?reply-fn就返回响应."
   [{:keys [event ring-req uid ?reply-fn]}]
   (binding [*request* ring-req]
-    (let [reply (event-msg-handler uid (first event) (second event))]
+    (let [[ev-id ev-msg] event
+          reply (event-msg-handler uid ev-id ev-msg)]
       (when ?reply-fn
         (?reply-fn reply)))))

@@ -1,5 +1,5 @@
 * 约定
-query: [key selector params]
+expr: [key selector params]
 sub: 订阅
 pub: 发行
 

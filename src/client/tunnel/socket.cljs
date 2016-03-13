@@ -2,8 +2,9 @@
   "和websocket相关的代码."
   (:require-macros
    [cljs.core.async.macros :as asyncm :refer (go go-loop)]
-   [taoensso.timbre :refer [debug spy]])
+   [taoensso.timbre :refer [info debug spy]])
   (:require
+   [tunnel.state :as state]
    [cljs.core.async :as async :refer (<! >! put! chan)]
    [taoensso.sente  :as sente :refer (cb-success?)]))
 
@@ -12,12 +13,13 @@
 ;; 所以UI产生的需要websocket处理的事件统一发送到这个channel.
 (defonce ch-ev (chan))
 
-;; =============================================================================
+;; ==============================================================================
 ;; WebSocket Init
 
 (let [{:keys [chsk ch-recv send-fn state]}
       (sente/make-channel-socket! "/chsk"
         {:type :auto                    ; e/o #{:auto :ajax :ws}
+         :wrap-recv-evs? false          ; 不自动的为服务器推送的数据添加默认event-id
          })]
   (def chsk       chsk)
   (def ch-chsk    ch-recv)
@@ -28,8 +30,8 @@
   (fn [ev-id ev-msg] ev-id))
 
 (defn send!
-  [ev]
-  (put! ch-ev ev))
+  [ev cb]
+  (put! ch-ev {:ev ev :cb cb}))
 
 ;; (send! [:msg/test {:text "hello, world"}])
 
@@ -38,9 +40,11 @@
   TODO 处理回调函数."
   []
   (go-loop []
-    (let [ev (<! ch-ev)]
+    (let [{:keys [ev cb]} (<! ch-ev)]
       (debug "chsk-send: " ev)
-      (chsk-send! ev 1000 #(prn %))
+      (if cb
+        (chsk-send! ev 1000 cb)
+        (chsk-send! ev))
       (recur))))
 
 (defmethod event-msg-handler :chsk/state
@@ -52,16 +56,18 @@
 ;; 服务器向客户端推送数据的事件.
 (defmethod event-msg-handler :system/pub
   [ev-id ev-msg]
-  (prn ev-id ev-msg))
+  (state/merge! ev-msg))
 
 (defmethod event-msg-handler :default
   [ev-id ev-msg]
-  (prn ev-id ev-msg))
+  )
 
 (defn event-msg-handler*
   [{:keys [event]}]
+  (info (first event) (second event))
   (event-msg-handler (first event) (second event)))
 
 ;; 用event-msg-handler代替prn, event-msg-handler: (event)
 (sente/start-client-chsk-router! ch-chsk
   event-msg-handler*)
+
