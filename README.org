@@ -1,6 +1,10 @@
-* 开发中, 还不能使用:(
+* 简单的聊天程序 WRITE IN PURE CLOJURE.
+前端使用的reagent.
+后台使用http-kit.
+通信使用sente.
+后台数据库使用的datomic-free.
 
-* 如何运行
+* 开发
 ** 使用 ~cider-jack-in~ 启动REPL
 ** 启动, 重启, 停止所有组件
 #+BEGIN_SRC clojure
@@ -23,3 +27,6 @@
   ;; CLJS -> CLJ
   :cljs/quit
 #+END_SRC
+
+* 编译打包
+lein do clean, uberjar
