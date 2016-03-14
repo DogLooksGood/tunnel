@@ -1,11 +1,13 @@
 (ns tunnel.system
   (:require [figwheel-sidecar.system :as sys]
-            [dev.datomic :refer [new-database]]
+            [tunnel.datomic :refer [new-database]]
             [taoensso.sente.server-adapters.http-kit
              :refer (sente-web-server-adapter)]
             [system.components
-             [sente :refer [new-channel-sockets]]]
+             [sente :refer [new-channel-sockets]]
+             [http-kit :refer [new-web-server]]]
             [system.core :refer [defsystem]]
+            [tunnel.core :refer [ring-handler]]
             [tunnel.handler :as hdlr]
             [tunnel.subs :as subs]
             [tunnel.db :as db]))
@@ -16,3 +18,5 @@
    :figwheel-system (sys/figwheel-system (sys/fetch-config))
    :datomic (new-database  "datomic:mem://localhost:4334/test")
    :tx-listener (db/tx-listener #'subs/parse-tx)])
+
+

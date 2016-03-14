@@ -57,5 +57,28 @@
   :db/cardinality :db.cardinality/many
   :db/doc "用户的白名单, ref指向其他用户的entity-id"
   :db.install/_attribute :db.part/db}
+
+
+ ;; Message
+ {:db/id #db/id [:db.part/db]
+  :db/ident :message/from
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "消息的发送者"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :message/to
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "消息的接受者"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :message/content
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc "消息的内容"
+  :db.install/_attribute :db.part/db}
  
  ]

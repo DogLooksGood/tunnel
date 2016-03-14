@@ -4,6 +4,8 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
+  :jvm-opts ^:replace ["-Xms512m" "-Xmx512m" "-server"]
+
   :min-lein-version "2.5.3"
   
   :dependencies [[org.clojure/clojure "1.7.0"]
@@ -13,27 +15,27 @@
                  [ring "1.4.0"]
                  [ring/ring-defaults "0.1.5"]
                  [hiccup "1.0.5"]
+                 ;; [com.stuartsierra/component "0.3.1"]
                  [com.taoensso/sente "1.8.1"]
-                 [org.danielsz/system "0.2.0"]
+                 ;; [org.danielsz/system "0.2.0"]
+                 [org.danielsz/system "0.3.0-SNAPSHOT"]
                  [reagent "0.6.0-alpha"]
                  [garden "1.3.2"]
+                 [http-kit "2.1.19"]
                  [compojure "1.4.0"]
                  [secretary "1.2.3"]
                  [datascript "0.15.0"]
-                 [com.datomic/datomic-free "0.9.5350"]
-                 ;; DEV 后期挪出去
-                 [figwheel-sidecar "0.5.0"]]
+                 [com.datomic/datomic-free "0.9.5350"]]
   
-  :plugins [[lein-figwheel "0.5.0-6"]
-            [lein-cljsbuild "1.1.2" :exclusions [[org.clojure/clojure]]]]
+  :plugins [[lein-cljsbuild "1.1.2" :exclusions [[org.clojure/clojure]]]]
 
-  :source-paths ["src/server" "src/shared" "env"]
+  :source-paths ["src/server" "src/shared"]
 
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
   :cljsbuild {:builds
               [{:id "dev"
-                :source-paths ["src/client"]
+                :source-paths ["src/client" "src/shared"]
 
                 :figwheel true
 
@@ -41,17 +43,31 @@
                            :asset-path "js/compiled/out"
                            :output-to "resources/public/js/compiled/tunnel.js"
                            :output-dir "resources/public/js/compiled/out"
-                           :source-map-timestamp true}}
-               ;; lein cljsbuild once min
-               {:id "min"
-                :source-paths ["src"]
-                :compiler {:output-to "resources/public/js/compiled/tunnel.js"
-                           :main tunnel.core
-                           :optimizations :advanced
-                           :pretty-print false}}]}
+                           :source-map-timestamp true}}]}
 
   :figwheel {:http-server-root "public"
-             ;; :css-dirs ["resources/public/css"]
              :ring-handler tunnel.core/ring-handler
-             :server-logfile "/tmp/figwheel-logfile.log"
-             })
+             :server-logfile "/tmp/figwheel-logfile.log"}
+
+  :profiles
+  {:dev
+   {:source-paths ["env/dev"]
+
+    :dependencies [[figwheel-sidecar "0.5.0"]]
+
+    :plugins [[lein-figwheel "0.5.0-6"]]}
+   
+   :uberjar
+   {:main user
+
+    :source-paths ["env/prod"]
+
+    :hooks [leiningen.cljsbuild]
+
+    :cljsbuild
+    {:builds [{:id "min"
+               :source-paths ["src/client" "src/shared"]
+               :compiler {:output-to "resources/public/js/compiled/tunnel.js"
+                          :main tunnel.core
+                          :optimizations :advanced
+                          :pretty-print false}}]}}})

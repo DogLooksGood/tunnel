@@ -10,8 +10,8 @@
                   {:user/username username
                    :user/password password})]
     (do
-      (db/mutate :user/set-status (merge user
-                                    {:user/status :online}))
+      (db/mutate {} :user/set-status (merge user
+                                       {:user/status :online}))
       user)
     (throw
       (ex-info

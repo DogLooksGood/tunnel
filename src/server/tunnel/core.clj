@@ -9,6 +9,7 @@
              [keyword-params]
              [params]
              [stacktrace]]
+            [ring.util.response :refer [redirect]]
             [ring.util.anti-forgery :refer [anti-forgery-field]]
             [tunnel.handler :as hdlr]
             [compojure.core :refer [defroutes GET POST]]))
@@ -17,18 +18,23 @@
 ;; Pages
 
 (defn index-page
+  "如果没有uid, 跳转到`login-page`."
   [req]
-  (html
-    [:head]
-    [:body
-     [:div#app]
-     (include-js "js/compiled/tunnel.js")]))
+  (let [uid (-> req :session :uid)]
+    (if uid
+      (html
+        [:head
+         [:meta {"charset" "utf-8"}]]
+        [:body
+         [:div#app]
+         (include-js "js/compiled/tunnel.js")])
+      (redirect "/login"))))
 
 (defn login-page
   [req]
   (html
     [:head
-     (include-css "css/normalize.css")]
+     [:meta {"charset" "utf-8"}]]
     [:body
      [:form {:method :POST :action "/api/login"}
       [:input {:name :username :type :text :placeholder "用户名"}]

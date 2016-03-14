@@ -3,6 +3,7 @@
             [tunnel.style.screen]       ; 加载样式
             [tunnel.remote :as remote]
             [tunnel.state :as state]
+            [tunnel.component.root :refer [root]]
             [reagent.core :as r]
             [goog.dom :as gdom]))
 
@@ -24,15 +25,19 @@
            "LOG"]
           (for [user @user-list]
             ^{:key (:db/id user)} [:div (:user/username user)])
+          [:button {:on-click #(remote/fetch user-expr)}
+           "FETCH"]
           i]))
      :component-will-mount
      (fn [this]
-       (remote/fetch-and-register user-expr))
+       ;; (remote/fetch-and-register user-expr)
+       )
      :component-will-unmount
      (fn [this]
-       (remote/unregister-remote-sub user-expr))}))
+       ;; (remote/unregister-remote-sub user-expr)
+       )}))
 
 (r/render-component
-  [hello-world {:i 10}]
+  [root]
   (gdom/getElement "app"))
 

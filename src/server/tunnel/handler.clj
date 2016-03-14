@@ -69,8 +69,15 @@
   (fn [uid ev-id ev-msg]
     ev-id))
 
+;; 这里的逻辑有一些混乱, 需要整理.
+;; 所有的非常用的参数, 需要放到env中, 传递到query, mutate等函数中.
 (defmethod event-msg-handler :user/command
-  [uid ev-id ev-msg])
+  [uid ev-id [key params]]
+  (when uid
+    (debug "Handler user command: " key params)
+    (let [env {:uid uid
+               :session *session*}]
+      {:status (db/mutate env key params)})))
 
 (defmethod event-msg-handler :user/fetch
   [uid ev-id [key selector params :as expr]]
@@ -99,7 +106,9 @@
 ;; 用户websocket断开时, 结束所有uid相关的订阅.
 (defmethod event-msg-handler :chsk/uidport-close
   [uid ev-id _]
-  (subs/unregister-all-subs uid))
+  (subs/unregister-all-subs uid)
+  ;; 这里应该用户登出, 暂时不处理
+  )
 
 (defmethod event-msg-handler :default
   [uid ev-id ev-msg])

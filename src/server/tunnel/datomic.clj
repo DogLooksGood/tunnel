@@ -1,15 +1,16 @@
-(ns dev.datomic
+(ns tunnel.datomic
   "测试环境用的datomic组件, 没有用system中自带的.
   这个组件在启动的时候, 会加载`data/schema.edn`和`data/initial.edn`中的内容."
-  (:require [datomic.api :as d]
-            [com.stuartsierra.component :as component]
+  (:require [com.stuartsierra.component :as component]
+            [datomic.api :as d]
             [clojure.java.io :as io])
-  (:import datomic.Util))
+  (:import datomic.Util
+           com.stuartsierra.component.Lifecycle))
 
 ;; =============================================================================
 ;; Component
 (defrecord DatomicDatabase [uri schema initial-data connection]
-  component/Lifecycle
+  Lifecycle
   (start [component]
     (d/create-database uri)
     (let [c (d/connect uri)]

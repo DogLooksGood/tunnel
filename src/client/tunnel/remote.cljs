@@ -31,14 +31,19 @@
 
 ;; =============================================================================
 ;; Register/Unregister
+(defn command
+  "发送一个命令."
+  [[key params]]
+  (let [expr [key params]]
+    (socket/send! [:user/command expr] nil)))
 
-(defn register-remote-sub
+(defn register-sub
   "订阅一个远程的查询"
   [[key selector params]]
   (let [expr [key selector params]]
     (swap! sub->count sub-count-inc expr :user/register-sub)))
 
-(defn unregister-remote-sub
+(defn unregister-sub
   "取消订阅一个远程的查询"
   [[key selector params]]
   (let [expr [key selector params]]
