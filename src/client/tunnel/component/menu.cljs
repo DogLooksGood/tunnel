@@ -12,7 +12,7 @@
        (let [user-list (state/remote ?user-list)]
          [:div.menu
           [:div.menu-profile
-           [:div.username "狗好看的窝"]]
+           [:div.username "TUNNEL"]]
           [:div.menu-list
            [:ul.list.menu-item-list
             [:li.item.menu-item-title "所有用户"]

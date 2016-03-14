@@ -10,13 +10,15 @@
     (set! (.-rows e) n)))
 
 (defn- input-key-down
-  [e]
-  (when (and (= 13 (.-keyCode e))
-          (or (.-ctrlKey e) (.-metaKey e)))
-    (let [v (.-value (gdom/getElement "msg-input"))]
+  [ev]
+  (when (and (= 13 (.-keyCode ev))
+          (or (.-ctrlKey ev) (.-metaKey ev)))
+    (let [e (gdom/getElement "msg-input")
+          v (.-value e)]
       (when-not (empty? v)
         (remote/command [:user/send-message {:content v}])
-        (set! (.-value (gdom/getElement "msg-input")) "")))))
+        (set! (.-value e) "")
+        (set! (.-rows e) 1)))))
 
 (defn input-panel
   []

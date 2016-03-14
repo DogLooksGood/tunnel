@@ -7,8 +7,6 @@
   :jvm-opts ^:replace ["-Xms512m" "-Xmx512m" "-server"]
 
   :min-lein-version "2.5.3"
-
-  :main tunnel.entry
   
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.170"]
@@ -28,7 +26,8 @@
                  [datascript "0.15.0"]
                  [com.datomic/datomic-free "0.9.5350"]]
   
-  :plugins [[lein-cljsbuild "1.1.2" :exclusions [[org.clojure/clojure]]]]
+  :plugins [[lein-cljsbuild "1.1.2" :exclusions [[org.clojure/clojure]]]
+            [lein-externs "0.1.5"]]
 
   :source-paths ["src/server" "src/shared"]
 
@@ -57,12 +56,20 @@
    
    :uberjar
    {:aot :all
+
+    :main tunnel.entry
+
     :omit-source true
+
     :source-paths ["env/prod"]
 
     :hooks [leiningen.cljsbuild]
 
-    :cljsbuild {:builds {:app {:compiler {:output-to "resources/public/js/compiled/tunnel.js"
-                                          :main tunnel.core
-                                          :optimizations :advanced
-                                          :pretty-print false}}}}}})
+    :cljsbuild {:builds
+                {:app
+                 {:compiler
+                  {:output-to "resources/public/js/compiled/tunnel.js"
+                   :main tunnel.core
+                   :externs ^:replace ["externs.js"]
+                   :optimizations :advanced
+                   :pretty-print false}}}}}})

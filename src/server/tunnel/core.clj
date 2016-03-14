@@ -24,9 +24,13 @@
     (if uid
       (html
         [:head
-         [:meta {"charset" "utf-8"}]]
+         [:meta {"charset" "utf-8"}]
+         (include-css "//cdn.bootcss.com/highlight.js/9.2.0/styles/github-gist.min.css")]
         [:body
          [:div#app]
+         (include-js "//cdn.bootcss.com/marked/0.3.5/marked.min.js"
+           "//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"
+           "//cdn.bootcss.com/highlight.js/9.2.0/languages/java.min.js")
          (include-js "js/compiled/tunnel.js")])
       (redirect "/login"))))
 

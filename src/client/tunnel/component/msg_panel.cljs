@@ -1,6 +1,7 @@
 (ns tunnel.component.msg-panel
   (:require [goog.dom :as gdom]
             [reagent.core :as r]
+            [tunnel.markdown :refer [markdown]]
             [tunnel.remote :as remote]
             [tunnel.state :as state]))
 
@@ -21,7 +22,8 @@
         [:div.msg-from
          (-> msg :message/from :user/username)]
         [:div.msg-content
-         (:message/content msg)]])]))
+         {:dangerouslySetInnerHTML
+          {:__html (markdown (:message/content msg))}}]])]))
 
 (defn- scroll-to-bottom
   []

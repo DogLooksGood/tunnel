@@ -45,7 +45,7 @@
 ;; 测试
 (def ^:const global
   [:body {:background-color :white
-          :font {:family "sans-serif"
+          :font {:family ["Segoe UI" , "Helvetica" , "Arial" , "sans-serif"]
                  :size :large}}
    [:.list {:margin 0
             :padding 0}]
@@ -116,10 +116,16 @@
      ]
     [:.msg-content {:border {:radius (px 10)
                              :color grey-100}
-                    :padding e3
+                    :font {:size ft-1}
                     :margin {:left e2}
-                    :display :inline-block
-                    :background-color grey-100}]]])
+                    :padding {:left e1 :right e1}
+                    :display :inline-block}
+     [:p>code {:border {:color grey-300
+                        :style :solid
+                        :width (px 1)}
+               :padding e1
+               :background-color grey-100}]]]])
+
 
 (def root
   `[~@global

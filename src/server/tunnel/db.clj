@@ -1,12 +1,13 @@
 (ns tunnel.db
   (:require [com.stuartsierra.component :as component]
+            [tunnel.constant :refer [datomic-uri]]
             [taoensso.timbre :refer [debug spy]]
             [datomic.api :as d]
             [tunnel.utils :as utils]))
 
 (defmacro with-conn
   [conn & exprs]
-  `(let [~conn (d/connect "datomic:mem://localhost:4334/test")]
+  `(let [~conn (d/connect datomic-uri)]
      (do ~@exprs)))
 
 ;; 直接查询返回查询结果.
