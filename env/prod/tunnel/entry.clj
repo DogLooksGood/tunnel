@@ -1,5 +1,4 @@
-(ns user
-  "默认的NS, REPL启动的时候自动加载本文件."
+(ns tunnel.entry
   (:require [reloaded.repl :refer [system init start stop go reset]]
             [tunnel.system :refer [prod-system]])
   (:gen-class))

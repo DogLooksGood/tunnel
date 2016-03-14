@@ -2,8 +2,7 @@
   (:require [com.stuartsierra.component :as component]
             [taoensso.timbre :refer [debug spy]]
             [datomic.api :as d]
-            [tunnel.utils :as utils])
-  (:import com.stuartsierra.component.Lifecycle))
+            [tunnel.utils :as utils]))
 
 (defmacro with-conn
   [conn & exprs]
@@ -51,7 +50,7 @@
   (future-cancel tx-listener))
 
 (defrecord TxListener [callback tx-listener]
-  Lifecycle
+  component/Lifecycle
   (start [component]
     (assoc component
       :tx-listener (start-tx-listener callback)))
@@ -79,6 +78,7 @@
 
 ;; =============================================================================
 ;; Users
+
 
 (defmethod query :user/login
   [key selector params]
@@ -128,6 +128,16 @@
            [$tx-data ?e]
            [?e :message/from]]
       db tx-data selector)))
+
+(defmethod mutate :user/register
+  [env key params]
+  (let [{:keys [username password]} params]
+    (with-conn conn
+      @(d/transact conn
+         [{:db/id #db/id [:db.part/user]
+           :user/username username
+           :user/password password
+           :user/status :offline}]))))
 
 (defmethod mutate :user/set-status
   [env key params]

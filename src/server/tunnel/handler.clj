@@ -38,6 +38,14 @@
       {:session {:uid (:db/id user)
                  :token (gen-token)}})))
 
+(defmethod api-handler :register
+  [_ params]
+  (let [{:keys [username password]} params
+        {status :status} (service/user-register username password)]
+    (if (= status :success)
+      (redirect "/login")
+      (redirect "/register"))))
+
 (defn api-handler*
   "入口函数, 简易处理
   TODO 实现异常处理和跳转"

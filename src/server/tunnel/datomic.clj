@@ -4,13 +4,12 @@
   (:require [com.stuartsierra.component :as component]
             [datomic.api :as d]
             [clojure.java.io :as io])
-  (:import datomic.Util
-           com.stuartsierra.component.Lifecycle))
+  (:import datomic.Util))
 
 ;; =============================================================================
 ;; Component
 (defrecord DatomicDatabase [uri schema initial-data connection]
-  Lifecycle
+  component/Lifecycle
   (start [component]
     (d/create-database uri)
     (let [c (d/connect uri)]

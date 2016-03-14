@@ -30,6 +30,20 @@
          (include-js "js/compiled/tunnel.js")])
       (redirect "/login"))))
 
+(defn register-page
+  [req]
+  (html
+    [:head
+     [:meta {"charset" "utf-8"}]]
+    [:body
+     [:h3 "测试, 不要用惯用密码."]
+     [:form {:method :POST :action "/api/register"}
+      [:input {:name :username :type :text}]
+      [:input {:name :password :type :password}]
+      [:input {:type :submit :value "注册"}]
+      (anti-forgery-field)]
+     [:a {:href "/login"} "返回登陆"]]))
+
 (defn login-page
   [req]
   (html
@@ -40,11 +54,13 @@
       [:input {:name :username :type :text :placeholder "用户名"}]
       [:input {:name :password :type :password}]
       [:input {:type :submit :value "登陆"}]
-      (anti-forgery-field)]]))
+      (anti-forgery-field)]
+     [:a {:href "/register"} "注册(测试)"]]))
 
 (defroutes route
   (GET "/" req index-page)
   (GET "/login" req login-page)
+  (GET "/register" req register-page)
   (POST "/api/:key" req hdlr/api-handler*)
   (GET "/chsk" req ((-> system :sente :ring-ajax-get-or-ws-handshake) req))
   (POST "/chsk" req ((-> system :sente :ring-ajax-post) req)))

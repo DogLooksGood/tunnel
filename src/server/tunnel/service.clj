@@ -1,5 +1,21 @@
 (ns tunnel.service
-  (:require [tunnel.db :as db]))
+  (:require [tunnel.db :as db]
+            [taoensso.timbre :refer [trace error]]))
+
+;; TODO 需要统一返回格式, 这个模块似乎有点多余.
+
+(defn user-register
+  "用户注册"
+  [username password]
+  (try
+    (db/mutate {} :user/register {:username username
+                                  :password password})
+    {:status :success}
+    (catch Exception ex
+      (trace ex)
+      (error ex)
+      {:status :error
+       :message "注册失败"})))
 
 (defn user-login
   "用户登陆, 登陆成功返回用户实体, 登陆失败抛出异常.

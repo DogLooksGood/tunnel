@@ -7,6 +7,8 @@
   :jvm-opts ^:replace ["-Xms512m" "-Xmx512m" "-server"]
 
   :min-lein-version "2.5.3"
+
+  :main tunnel.entry
   
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.170"]
@@ -15,9 +17,8 @@
                  [ring "1.4.0"]
                  [ring/ring-defaults "0.1.5"]
                  [hiccup "1.0.5"]
-                 ;; [com.stuartsierra/component "0.3.1"]
+                 [com.stuartsierra/component "0.3.1"]
                  [com.taoensso/sente "1.8.1"]
-                 ;; [org.danielsz/system "0.2.0"]
                  [org.danielsz/system "0.3.0-SNAPSHOT"]
                  [reagent "0.6.0-alpha"]
                  [garden "1.3.2"]
@@ -34,16 +35,13 @@
   :clean-targets ^{:protect false} ["resources/public/js/compiled" "target"]
 
   :cljsbuild {:builds
-              [{:id "dev"
-                :source-paths ["src/client" "src/shared"]
-
-                :figwheel true
-
-                :compiler {:main tunnel.core
-                           :asset-path "js/compiled/out"
-                           :output-to "resources/public/js/compiled/tunnel.js"
-                           :output-dir "resources/public/js/compiled/out"
-                           :source-map-timestamp true}}]}
+              {:app {:source-paths ["src/client" "src/shared"]
+                     :figwheel true
+                     :compiler {:main tunnel.core
+                                :asset-path "js/compiled/out"
+                                :output-to "resources/public/js/compiled/tunnel.js"
+                                :output-dir "resources/public/js/compiled/out"
+                                :source-map-timestamp true}}}}
 
   :figwheel {:http-server-root "public"
              :ring-handler tunnel.core/ring-handler
@@ -58,16 +56,13 @@
     :plugins [[lein-figwheel "0.5.0-6"]]}
    
    :uberjar
-   {:main user
-
+   {:aot :all
+    :omit-source true
     :source-paths ["env/prod"]
 
     :hooks [leiningen.cljsbuild]
 
-    :cljsbuild
-    {:builds [{:id "min"
-               :source-paths ["src/client" "src/shared"]
-               :compiler {:output-to "resources/public/js/compiled/tunnel.js"
-                          :main tunnel.core
-                          :optimizations :advanced
-                          :pretty-print false}}]}}})
+    :cljsbuild {:builds {:app {:compiler {:output-to "resources/public/js/compiled/tunnel.js"
+                                          :main tunnel.core
+                                          :optimizations :advanced
+                                          :pretty-print false}}}}}})

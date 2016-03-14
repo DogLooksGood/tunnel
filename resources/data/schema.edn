@@ -3,6 +3,7 @@
  {:db/id #db/id [:db.part/db]
   :db/ident :user/username
   :db/valueType :db.type/string
+  :db/unique :db.unique/identity
   :db/cardinality :db.cardinality/one
   :db/doc "用户名"
   :db.install/_attribute :db.part/db}
