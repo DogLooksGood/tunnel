@@ -17,6 +17,10 @@
       {:status :error
        :message "注册失败"})))
 
+(defn user-auto-login
+  [uid]
+  (db/mutate {} :user/set-status {:db/id uid :user/status :online}))
+
 (defn user-login
   "用户登陆, 登陆成功返回用户实体, 登陆失败抛出异常.
   如果登陆成功, 用户的状态会修改为在线 :online"

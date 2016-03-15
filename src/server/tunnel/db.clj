@@ -114,11 +114,12 @@
 (defmethod query :message/list-all
   [key selector params]
   (with-conn conn
-    (d/q '[:find [(pull ?e selector) ...]
-           :in $ selector
-           :where
-           [?e :message/from]]
-      (d/db conn) selector)))
+    (let [db (d/db conn)]
+      (->> (d/datoms db
+             :aevt :message/from)
+        reverse
+        (take 30)
+        (mapv #(d/pull db selector (:e %)))))))
 
 (defmethod scoped-query :message/list-all
   [key selector params db tx-data]
@@ -197,7 +198,7 @@
   (with-conn conn
     @(d/transact conn
        [{:db/id #db/id [:db.part/user]
-         :user/username "狗好看"
+         :user/username "a0"
          :user/password "321"
          :user/status :offline}]))
 

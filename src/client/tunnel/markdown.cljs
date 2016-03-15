@@ -9,4 +9,8 @@
 
 (defn markdown
   [text]
-  (js/marked text))
+  (if text
+    (js/marked text)
+    (do
+      (js/console.error "marked parsing nil")
+      "NIL CONTENT")))

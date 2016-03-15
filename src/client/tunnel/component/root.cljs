@@ -9,6 +9,7 @@
   [:div.container
    [menu]
    [:div.content
-    [:div.header "哇咔咔"]
+    [:div.header
+     [:span "A Chatroom written in pure Clojure ^_^"]]
     [input-panel]
     [msg-panel]]])

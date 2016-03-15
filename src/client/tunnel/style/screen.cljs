@@ -2,11 +2,14 @@
   (:require [tunnel.style.normalize :refer [normalize]]
             [goog.style :as gs]
             [garden.core :refer [css]]
+            [garden.stylesheet :refer [at-media]]
             [garden.units :refer [vh px em percent]]))
 
 (def indigo-200 "#9FA8DA")
 (def indigo-500 "#3F51B5")
 (def indigo-800 "#283593")
+(def teal-a400 "#1DE9B6")
+(def teal-a700 "#00BFA5")
 (def grey-100 "#F5F5F5")
 (def grey-300 "#E0E0E0")
 (def grey-600 "#757575")
@@ -85,11 +88,18 @@
                                   :left e2
                                   :bottom e1}}]]])
 
+(def ^:const menu-m
+  (at-media {:max-width (px 979)}
+    [:.menu {:display :none}]))
+
 (def ^:const content
   [:.content {:height (vh 100)
               :overflow :hidden
               :position :relative}
    [:.header {:height header-h
+              :padding e1
+              :font {:style :italic}
+              :box-sizing :border-box
               :background-color grey-100}]])
 
 (def ^:const input-panel
@@ -97,14 +107,31 @@
                   :width (percent 100)
                   :text-align :center
                   :bottom 0}
+   [:.input-group {:width (percent 80)
+                   :display :flex
+                   :margin {:left :auto :right :auto
+                            :bottom e4}}]
    [:textarea {:resize :none
-               :width (percent 80)
                :outline :none
-               :border {:radius (px 5)
+               :box-sizing :border-box
+               :border {:top-left-radius (px 5)
+                        :bottom-left-radius (px 5)
+                        :right-width 0
                         :color grey-600}
-               :font {:size ft0}
-               :margin {:left :auto :right :auto
-                        :bottom e4}}]])
+               :display :inline-block
+               :flex-grow 2
+               :font {:size ft0}}]
+   [:.msg-send {:border {:width (px 1)
+                         :style :solid
+                         :top-right-radius (px 5)
+                         :bottom-right-radius (px 5)
+                         :color grey-600}
+                :box-sizing :border-box
+                :display :inline-block
+                :padding {:top e1 :bottom e1 :left e3 :right e3}
+                }
+    [:&:hover {:background teal-a400}]
+    [:&:active {:background teal-a700}]]])
 
 (def ^:const msg-panel
   [:.msg-panel {:margin e1
@@ -130,6 +157,7 @@
 (def root
   `[~@global
     ~menu
+    ~menu-m
     ~content
     ~input-panel
     ~msg-panel])

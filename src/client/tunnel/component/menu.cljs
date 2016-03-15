@@ -22,7 +22,7 @@
 
      :component-will-mount
      (fn []
-       (remote/fetch-and-register ?user-list))
+       (remote/register-sub ?user-list))
 
      :component-will-unmount
      (fn []

@@ -12,12 +12,12 @@
 
 (defn- sub-count-inc
   "一个不太整洁的实现."
-  [m expr ev-id]
+  [m expr]
   (if (contains? m expr)
     (update m expr inc)
     (do
       (println "Register sub: " expr)
-      (socket/send! (spy [ev-id expr]) state/merge!)
+      (socket/send! (spy [:user/register-sub expr]) state/merge!)
       (assoc m expr 1))))
 
 (defn- sub-count-dec
@@ -37,12 +37,6 @@
   (let [expr [key params]]
     (socket/send! [:user/command expr] nil)))
 
-(defn register-sub
-  "订阅一个远程的查询"
-  [[key selector params]]
-  (let [expr [key selector params]]
-    (swap! sub->count sub-count-inc expr :user/register-sub)))
-
 (defn unregister-sub
   "取消订阅一个远程的查询"
   [[key selector params]]
@@ -56,14 +50,19 @@
   (let [expr [key selector params]]
     (socket/send! [:user/fetch expr] state/merge!)))
 
-(defn fetch-and-register
+(defn register-sub
   "先查询, 然后再订阅这个查询"
   [[key selector params]]
   (let [expr [key selector params]]
-    (swap! sub->count sub-count-inc expr :user/fetch-and-register)))
+    (swap! sub->count sub-count-inc expr)))
 
+(defn re-register-all-subs
+  "重新订阅所有, 用于断线重连之后."
+  []
+  (doseq [expr (keys @sub->count)]
+    (socket/send! [:user/register-sub expr] state/merge!)))
 
-
+(reset! socket/reconnect-callback re-register-all-subs)
 
 
 

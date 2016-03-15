@@ -38,7 +38,7 @@
 
      :component-will-mount
      (fn []
-       (remote/fetch-and-register ?msg-list))
+       (remote/register-sub ?msg-list))
 
      :component-did-update
      scroll-to-bottom

@@ -47,11 +47,17 @@
         (chsk-send! ev))
       (recur))))
 
+(defonce reconnect-callback (atom nil))
+
 (defmethod event-msg-handler :chsk/state
   [ev-id ev-msg]
   (let [{:keys [open? first-open?]} ev-msg]
-    (when (and open? first-open?)
-      (consume-ch-ev))))
+    ;; (when (and open? first-open?)
+    ;;   (consume-ch-ev))
+    (case [open? first-open?]
+      [true true] (consume-ch-ev)
+      [true nil] (@reconnect-callback)
+      nil)))
 
 ;; 服务器向客户端推送数据的事件.
 (defmethod event-msg-handler :system/pub
@@ -60,7 +66,7 @@
 
 (defmethod event-msg-handler :default
   [ev-id ev-msg]
-  )
+  (info ev-id ev-msg))
 
 (defn event-msg-handler*
   [{:keys [event]}]
