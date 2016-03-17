@@ -2,8 +2,8 @@
   (:require [tunnel.style.normalize :refer [normalize]]
             [goog.style :as gs]
             [garden.core :refer [css]]
-            [garden.stylesheet :refer [at-media]]
-            [garden.units :refer [vh px em percent]]))
+            [garden.stylesheet :refer [at-media at-keyframes]]
+            [garden.units :refer [vh px em percent s]]))
 
 (def indigo-200 "#9FA8DA")
 (def indigo-500 "#3F51B5")
@@ -15,6 +15,8 @@
 (def grey-400 "#BDBDBD")
 (def grey-500 "#9E9E9E")
 (def grey-600 "#757575")
+(def light-green-50 "#F1F8E9")
+(def light-blue-50 "#E1F5FE")
 
 ;; =============================================================================
 ;; Height & Width
@@ -48,7 +50,17 @@
   (reset! style nil))
 
 ;; =============================================================================
+;; Keyframes
+
+(def ^:const keyframes
+  (at-keyframes
+    :btn-frame
+    {:from {:color teal-a400}
+     :to {:color teal-a700}}))
+
+;; =============================================================================
 ;; Global
+
 (def ^:const global
   [:body {:background-color :white
           :font {:family ["Segoe UI" , "Helvetica" , "Arial" , "sans-serif"]
@@ -72,13 +84,13 @@
                     :padding e2
                     :height header-h
                     :background-color indigo-800}
-    [:.username {}]]
+    [:.username {:font {:size ft+2}}]]
    [:.menu-list {:color grey-300
                  :width :inherit
                  :box-sizing :border-box
                  :padding e2
                  :padding-left 0}
-    [:.menu-item.active {:color :white}]
+    [:.menu-item.online {:color :white}]
     [:.menu-item {:font {:size ft-1}
                   :color grey-500
                   :padding {:top e1
@@ -108,10 +120,14 @@
               :overflow :hidden
               :position :relative}
    [:.header {:height header-h
-              :padding e1
+              :line-height header-h
+              :vertical-align :middle
+              :padding-left e1
               :font {:style :italic}
               :box-sizing :border-box
-              :background-color grey-100}]])
+              :background-color grey-100}
+    [:span.icons {:font {:size ft+2}}
+     [:i {:margin-right e2}]]]])
 
 ;; =============================================================================
 ;; Input Panel
@@ -127,8 +143,9 @@
    [:textarea {:resize :none
                :outline :none
                :box-sizing :border-box
-               :border {:top-left-radius (px 5)
-                        :bottom-left-radius (px 5)
+               :border {
+                        ;; :top-left-radius (px 5)
+                        ;; :bottom-left-radius (px 5)
                         :right-width 0
                         :color grey-600}
                :display :inline-block
@@ -136,8 +153,8 @@
                :font {:size ft0}}]
    [:.msg-send {:border {:width (px 1)
                          :style :solid
-                         :top-right-radius (px 5)
-                         :bottom-right-radius (px 5)
+                         ;; :top-right-radius (px 5)
+                         ;; :bottom-right-radius (px 5)
                          :color grey-600}
                 :box-sizing :border-box
                 :display :inline-block
@@ -148,33 +165,59 @@
 ;; =============================================================================
 ;; Message Panel
 (def ^:const msg-panel
-  [:.msg-panel {:margin e1
-                :height (vh 80)
+  [:.msg-panel {:height (vh 80)
                 :overflow :scroll}
-   [:.msg
+   [:.msg  {:transition {:property [:background-color :border-color :border-width]
+                         :duration (s 0.7)}
+            :padding {:bottom e2}
+            :border {:width 0
+                     :top-width (px 1)
+                     :style :solid
+                     :color :white}}
+    [:&:hover {:background-color light-blue-50
+               :border {:color indigo-200
+                        :style :solid
+                        :width 0
+                        :top-width (px 1)}}]
     [:.msg-from {:color grey-600
-                 :padding e1}
-     ]
+                 :display :inline-block
+                 :padding e1}]
+    [:.msg-time {:display :inline-block
+                 :color grey-500
+                 :font {:size ft-1}}]
     [:.msg-content {:border {:radius (px 10)
                              :color grey-100}
                     :font {:size ft-1}
                     :margin {:left e2}
                     :padding {:left e1 :right e1}
-                    :display :inline-block}
+                    ;; :display :inline-block
+                    }
+     [:p {:margin 0}]
      [:p>code {:border {:color grey-300
                         :style :solid
                         :width (px 1)}
-               :padding e1
+               :margin 0
                :background-color grey-100}]]]])
+
+(def btn
+  [:.btn {:color :black}
+   [:&:hover {:color teal-a400}]
+   [:&:active {:color teal-a700}]])
 
 
 (def root
-  `[~@global
-    ~menu
-    ~menu-m
-    ~content
-    ~input-panel
-    ~msg-panel])
+  [global
+   btn
+   menu
+   menu-m
+   content
+   input-panel
+   msg-panel])
+
+(js/console.log (css {:vendors ["moz" "webkit"]
+                      :pretty-print? true} 
+                  btn))
 
 (reset! style [(gs/installStyles (css normalize))
-               (gs/installStyles (css root))])
+               (gs/installStyles (css {:vendors ["moz" "webkit"]
+                                       :pretty-print? true} root))])

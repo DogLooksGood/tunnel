@@ -1,5 +1,6 @@
 (ns tunnel.component.msg-panel
   (:require [goog.dom :as gdom]
+            [goog.i18n.DateTimeFormat :as dtf]
             [reagent.core :as r]
             [tunnel.protocol :as p]
             [schema.core :as s]
@@ -10,15 +11,11 @@
 (p/register-query :message/list-all s/Any)
 
 
-(def msg-list-all
-  [:message/list-all {:sel '[:db/id
-                             :message/content
-                             {:message/from [:user/username]}]}])
-
 (def msg-list-q
   [:message/list-all
    {:sel '[:db/id
            :message/content
+           :message/time
            {:message/from [:user/username]}]}])
 
 (defn msg-panel-render
@@ -30,6 +27,9 @@
        [:div.msg
         [:div.msg-from
          (-> msg :message/from :user/username)]
+        [:div.msg-time
+         (.format (goog.i18n.DateTimeFormat. "MM-dd HH:mm:ss")
+           (:message/time msg))]
         [:div.msg-content
          {:dangerouslySetInnerHTML
           {:__html (markdown (:message/content msg))}}]])]))

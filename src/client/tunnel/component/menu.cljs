@@ -11,22 +11,27 @@
   (r/create-class
     {:reagent-render
      (fn []
-       (let [user-list (state/remote user-list-q)]
+       (let [user-list (state/remote user-list-q)
+             current-user (state/remote [:user/who-am-i {}])]
          [:div.menu
           [:div.menu-profile
-           [:div.username "TUNNEL"]]
+           [:div.username (:user/username @current-user)]]
           [:div.menu-list
            [:ul.list.menu-item-list
             [:li.item.menu-item-title "Users:"]
-            (for [user (sort-by :user/username @user-list)]
-              (if (= :online (:user/status user))
-                ^{:key (:db/id user)}
-                [:li.item.menu-item.active (:user/username user)]
-                ^{:key (:db/id user)}
-                [:li.item.menu-item (:user/username user)]))]]]))
+            (let [user-groups (group-by :user/status @user-list)
+                  users (lazy-cat (sort-by :user/username (:online user-groups))
+                          (sort-by :user/username (:offline user-groups)))]
+              (for [user users]
+                (if (= :online (:user/status user))
+                  ^{:key (:db/id user)}
+                  [:li.item.menu-item.online (:user/username user)]
+                  ^{:key (:db/id user)}
+                  [:li.item.menu-item (:user/username user)])))]]]))
 
      :component-will-mount
      (fn []
+       (remote/fetch [:user/who-am-i {}])
        (remote/subscribe user-list-q)
        )
 

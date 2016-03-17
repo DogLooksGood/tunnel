@@ -12,6 +12,9 @@
 ;; 列出所有消息
 (register-query :message/list-all s/Any)
 
+;; 获取当前用户
+(register-query :user/who-am-i nil)
+
 ;; =============================================================================
 ;; 命令
 

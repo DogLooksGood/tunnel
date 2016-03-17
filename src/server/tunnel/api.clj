@@ -32,6 +32,10 @@
       {:session {:uid (:db/id user)
                  :token (gen-token)}})))
 
+(defmethod api-handler :logout
+  [env _ params]
+  )
+
 (defmethod api-handler :register
   [env _ params]
   (let [{:keys [username password]} params
