@@ -1,9 +1,9 @@
 (ns tunnel.subs
   "服务器端的数据推送服务的订阅, 和取消订阅.
-  对于每一组`key+selector+params`, 得到tx的时候进行一次计算.
+  对于每一组`key+params`, 得到tx的时候进行一次计算.
   然后将计算结果发送给所有相关的`uid`对应的客户端."
   (:require [tunnel.utils :as utils]
-            [tunnel.db :as db]
+            [tunnel.parser :as parser]
             [taoensso.timbre :refer [spy error debug trace]]
             [reloaded.repl :refer [system]]))
 ;; =============================================================================
@@ -36,9 +36,9 @@
 (defn register-sub
   "注册一个客户端`uid`, 针对一个查询`key+selector+params`的订阅.
   uid只有在是数字的时候才有效."
-  [uid key selector params]
+  [uid key params]
   (when (number? uid)
-    (let [sub [key selector params]]
+    (let [sub [key  params]]
       (swap! uid<->sub
         (comp
           #(update-in % [:uid->sub uid] clojure.set/union #{sub})
@@ -46,9 +46,9 @@
 
 (defn unregister-sub
   "注销一个客户端的订阅."
-  [uid key selector params]
+  [uid key params]
   (when (number? uid)
-    (let [sub [key selector params]]
+    (let [sub [key  params]]
       (swap! uid<->sub
         (comp
           #(disj-or-dissoc-in % [:uid->sub] uid sub)
@@ -72,7 +72,7 @@
   (:uid->sub @uid<->sub))
 
 (defn sub->uid
-  "获取sub到uid的对应关系. sub是[key selector params], 对应 #{& uids}"
+  "获取sub到uid的对应关系. sub是[key  params], 对应 #{& uids}"
   []
   (:sub->uid @uid<->sub))
 
@@ -84,13 +84,14 @@
   [tx]
   (try
     (let [sub->uid* (sub->uid)]
-      (doseq [[[key selector params :as expr] uid-set] (spy sub->uid*)]
-        (let [delta (db/diff-result key selector params tx)
+      (doseq [[[key params :as expr] uid-set] (spy sub->uid*)]
+        (let [delta (parser/diff-result key params tx)
               send! (-> system :sente :chsk-send!)]
           (when (utils/delta? delta)
-            (doseq [uid uid-set]
-              (send! uid [:system/pub {:delta delta
-                                       :expr expr}]))))))
+            (doall
+              (pmap #(send! % [:system/pub {:delta delta
+                                            :expr expr}])
+                uid-set))))))
     (catch Exception ex
       (error "Parse Error: " ex)))
   (debug "Parse TX finished."))

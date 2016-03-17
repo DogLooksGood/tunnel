@@ -12,7 +12,7 @@
 (defn- send-msg
   [e v]
   (when-not (empty? v)
-    (remote/command [:user/send-message {:content v}])
+    (remote/dispatch [:message/send {:content v}])
     (set! (.-value e) "")
     (set! (.-rows e) 1)))
 

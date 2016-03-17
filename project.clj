@@ -14,6 +14,7 @@
                   :exclusions [org.clojure/tools.reader]]
                  [ring "1.4.0"]
                  [ring/ring-defaults "0.1.5"]
+                 [prismatic/schema "1.0.5"]
                  [hiccup "1.0.5"]
                  [com.stuartsierra/component "0.3.1"]
                  [com.taoensso/sente "1.8.1"]
@@ -44,6 +45,7 @@
 
   :figwheel {:http-server-root "public"
              :ring-handler tunnel.core/ring-handler
+             :open-file-command "myfile-opener"
              :server-logfile "/tmp/figwheel-logfile.log"}
 
   :profiles

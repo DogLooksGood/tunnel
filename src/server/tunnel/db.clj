@@ -6,9 +6,16 @@
             [tunnel.utils :as utils]))
 
 (defmacro with-conn
-  [conn & exprs]
+  [conn & body]
   `(let [~conn (d/connect datomic-uri)]
-     (do ~@exprs)))
+     (do ~@body)))
+
+(defmacro with-conn-db
+  [conn db & body]
+  `(let [conn# (d/connect datomic-uri)
+         ~conn conn#
+         ~db (d/db conn#)]
+     (do ~@body)))
 
 ;; 直接查询返回查询结果.
 (defmulti query
@@ -65,21 +72,13 @@
   (map->TxListener {:callback callback
                     :tx-listener nil}))
 
-;; =============================================================================
-;; DB Helper
 
-(defn diff-result
-  [key selector params tx]
-  (let [db-before (:db-before tx)
-        db-after (:db-after tx)
-        tx-data (:tx-data tx)
-        before (scoped-query key selector params db-before tx-data)
-        after (scoped-query key selector params db-after tx-data)]
-    (utils/diff :db/id before after)))
+;; =============================================================================
+;; 以下内容逐步废弃
+;; query.clj & mutate.clj
 
 ;; =============================================================================
 ;; Users
-
 
 (defmethod query :user/login
   [key selector params]
@@ -146,7 +145,7 @@
   (let [{:keys [user/status db/id]} params]
     (with-conn conn
       @(d/transact conn
-         [[:db/add id :user/status :online]]))))
+         [[:db/add id :user/status status]]))))
 
 (defmethod mutate :user/add-tag
   [env key params]
@@ -198,7 +197,7 @@
   (with-conn conn
     @(d/transact conn
        [{:db/id #db/id [:db.part/user]
-         :user/username "a0"
+         :user/username "abbb2"
          :user/password "321"
          :user/status :offline}]))
 

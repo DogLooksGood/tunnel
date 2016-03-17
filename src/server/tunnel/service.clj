@@ -2,6 +2,7 @@
   (:require [tunnel.db :as db]
             [taoensso.timbre :refer [trace error]]))
 
+;; 这个模块需要重构!
 ;; TODO 需要统一返回格式, 这个模块似乎有点多余.
 
 (defn user-register
@@ -38,6 +39,12 @@
         "Wrong username or password"
         {:type :user-not-found
          :cause :wrong-username-or-password}))))
+
+(defn user-logout
+  "用户登出"
+  [uid]
+  (db/mutate {} :user/set-status {:db/id uid
+                                  :user/status :offline}))
 
 
 

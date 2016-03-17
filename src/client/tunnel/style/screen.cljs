@@ -12,6 +12,8 @@
 (def teal-a700 "#00BFA5")
 (def grey-100 "#F5F5F5")
 (def grey-300 "#E0E0E0")
+(def grey-400 "#BDBDBD")
+(def grey-500 "#9E9E9E")
 (def grey-600 "#757575")
 
 ;; =============================================================================
@@ -45,7 +47,8 @@
     (gs/uninstallStyles s))
   (reset! style nil))
 
-;; 测试
+;; =============================================================================
+;; Global
 (def ^:const global
   [:body {:background-color :white
           :font {:family ["Segoe UI" , "Helvetica" , "Arial" , "sans-serif"]
@@ -56,6 +59,8 @@
             :padding 0
             :list-style-type :none}]])
 
+;; =============================================================================
+;; Menu
 (def ^:const menu
   [:.menu {:width menu-w
            :background-color indigo-500
@@ -73,7 +78,9 @@
                  :box-sizing :border-box
                  :padding e2
                  :padding-left 0}
+    [:.menu-item.active {:color :white}]
     [:.menu-item {:font {:size ft-1}
+                  :color grey-500
                   :padding {:top e1
                             :left e2
                             :bottom e1}}
@@ -88,10 +95,14 @@
                                   :left e2
                                   :bottom e1}}]]])
 
+;; =============================================================================
+;; Menu Mobile
 (def ^:const menu-m
   (at-media {:max-width (px 979)}
     [:.menu {:display :none}]))
 
+;; =============================================================================
+;; Content
 (def ^:const content
   [:.content {:height (vh 100)
               :overflow :hidden
@@ -102,6 +113,8 @@
               :box-sizing :border-box
               :background-color grey-100}]])
 
+;; =============================================================================
+;; Input Panel
 (def ^:const input-panel
   [:.input-panel {:position :absolute
                   :width (percent 100)
@@ -128,11 +141,12 @@
                          :color grey-600}
                 :box-sizing :border-box
                 :display :inline-block
-                :padding {:top e1 :bottom e1 :left e3 :right e3}
-                }
+                :padding {:top e1 :bottom e1 :left e3 :right e3}}
     [:&:hover {:background teal-a400}]
     [:&:active {:background teal-a700}]]])
 
+;; =============================================================================
+;; Message Panel
 (def ^:const msg-panel
   [:.msg-panel {:margin e1
                 :height (vh 80)

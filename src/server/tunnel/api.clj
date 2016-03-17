@@ -16,13 +16,13 @@
   "处理HTTP的API请求
   key: 对应url中的 /api/:key
   params: 对应提交的参数"
-  (fn [key params] key))
+  (fn [env key params] key))
 
 ;; =============================================================================
 ;; Implement
 
 (defmethod api-handler :login
-  [_ params]
+  [env _ params]
   (let [{:keys [username password]} params
         user (service/user-login username password)]
     ;; 如果登陆成功, 给session中添加uid, 作为sente的标识.
@@ -33,7 +33,7 @@
                  :token (gen-token)}})))
 
 (defmethod api-handler :register
-  [_ params]
+  [env _ params]
   (let [{:keys [username password]} params
         {status :status} (service/user-register username password)]
     (if (= status :success)

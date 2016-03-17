@@ -1,29 +1,37 @@
 (ns tunnel.component.menu
   (:require [reagent.core :as r]
+            [tunnel.protocol :as p]
             [tunnel.remote :as remote]
             [tunnel.state :as state]))
 
-(def ^:const ?user-list [:user/list-all '[*] {}])
+(def user-list-q
+  [:user/list-all {}])
 
 (def menu
   (r/create-class
     {:reagent-render
      (fn []
-       (let [user-list (state/remote ?user-list)]
+       (let [user-list (state/remote user-list-q)]
          [:div.menu
           [:div.menu-profile
            [:div.username "TUNNEL"]]
           [:div.menu-list
            [:ul.list.menu-item-list
-            [:li.item.menu-item-title "所有用户"]
+            [:li.item.menu-item-title "Users:"]
             (for [user (sort-by :user/username @user-list)]
-              ^{:key (:db/id user)}
-              [:li.item.menu-item (:user/username user)])]]]))
+              (if (= :online (:user/status user))
+                ^{:key (:db/id user)}
+                [:li.item.menu-item.active (:user/username user)]
+                ^{:key (:db/id user)}
+                [:li.item.menu-item (:user/username user)]))]]]))
 
      :component-will-mount
      (fn []
-       (remote/register-sub ?user-list))
+       (remote/subscribe user-list-q)
+       )
 
      :component-will-unmount
      (fn []
-       (remote/unregister-sub ?user-list))}))
+       (remote/unsubscribe user-list-q)
+       )}))
+

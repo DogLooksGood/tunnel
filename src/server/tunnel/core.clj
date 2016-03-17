@@ -11,6 +11,9 @@
              [stacktrace]]
             [ring.util.response :refer [redirect]]
             [ring.util.anti-forgery :refer [anti-forgery-field]]
+            [tunnel.parser]
+            [tunnel.query]
+            [tunnel.mutate]
             [tunnel.handler :as hdlr]
             [tunnel.page :as page]
             [compojure.core :refer [defroutes GET POST]]))
