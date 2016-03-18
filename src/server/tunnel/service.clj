@@ -43,8 +43,9 @@
 (defn user-logout
   "用户登出"
   [uid]
-  (db/mutate {} :user/set-status {:db/id uid
-                                  :user/status :offline}))
+  (when uid
+    (db/mutate {} :user/set-status {:db/id uid
+                                    :user/status :offline})))
 
 
 

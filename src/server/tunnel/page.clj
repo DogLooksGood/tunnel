@@ -21,6 +21,7 @@
              "//cdn.bootcss.com/highlight.js/9.2.0/styles/github-gist.min.css"
              "//cdn.bootcss.com/font-awesome/4.5.0/css/font-awesome.min.css")]
           [:body
+           (anti-forgery-field)
            [:div#app]
            (include-js "//cdn.bootcss.com/marked/0.3.5/marked.min.js"
              "//cdn.bootcss.com/highlight.js/9.2.0/highlight.min.js"

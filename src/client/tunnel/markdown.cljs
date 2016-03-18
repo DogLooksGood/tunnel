@@ -1,7 +1,10 @@
 (ns tunnel.markdown)
 
 (.setOptions js/marked
-  #js {:highlight (fn [code]
+  #js {:header false
+       :sanitize true
+       :breaks true
+       :highlight (fn [code]
                     (prn "---")
                     (-> code
                       js/hljs.highlightAuto

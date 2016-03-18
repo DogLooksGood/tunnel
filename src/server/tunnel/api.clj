@@ -1,5 +1,6 @@
 (ns tunnel.api
   (:require [tunnel.service :as service]
+            [taoensso.timbre :refer [debug spy]]
             [ring.util.response :refer [redirect]]))
 
 ;; =============================================================================
@@ -33,8 +34,13 @@
                  :token (gen-token)}})))
 
 (defmethod api-handler :logout
-  [env _ params]
-  )
+  [env _ _]
+  (let [{:keys [uid]} env]
+    (debug "LOGOUT" uid)
+    (service/user-logout uid)
+    (debug "LOGOUT!!!!")
+    {:session {}
+     :body "success"}))
 
 (defmethod api-handler :register
   [env _ params]

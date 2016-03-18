@@ -6,7 +6,8 @@
 
 (defmethod query :user/who-am-i
   [{:keys [uid db]} _ _]
-  (d/pull db '[:db/id :user/username] uid))
+  (when uid
+    (d/pull db '[:db/id :user/username] uid)))
 
 (defmethod query :user/list-all
   [{:keys [db]} _ _]

@@ -21,6 +21,7 @@
                  [org.danielsz/system "0.3.0-SNAPSHOT"]
                  [reagent "0.6.0-alpha"]
                  [garden "1.3.2"]
+                 [cljs-ajax "0.5.4"]
                  [http-kit "2.1.19"]
                  [compojure "1.4.0"]
                  [secretary "1.2.3"]

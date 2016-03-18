@@ -23,6 +23,7 @@
           env {:ring-req ring-req
                :uid (-> ring-req :session :uid)}]
       (ctx/with-context ring-req
+        (debug "API Access:" key params)
         (api/api-handler env key params)))
     (catch clojure.lang.ExceptionInfo ex
       {:body (.getMessage ex)

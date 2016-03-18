@@ -11,6 +11,7 @@
              [stacktrace]]
             [ring.util.response :refer [redirect]]
             [ring.util.anti-forgery :refer [anti-forgery-field]]
+            [ring.middleware.anti-forgery :refer [*anti-forgery-token*]]
             [tunnel.parser]
             [tunnel.query]
             [tunnel.mutate]
