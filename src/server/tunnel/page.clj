@@ -1,6 +1,7 @@
 (ns tunnel.page
   "页面"
   (:require [hiccup.page :refer [html5 include-css include-js]]
+            [tunnel.service :as service]
             [ring.util.response :refer [redirect]]
             [ring.util.anti-forgery :refer [anti-forgery-field]]))
 
@@ -12,12 +13,14 @@
       (do
         ;; TODO首先更新在线状态
         ;; 返回页面
+        (service/user-auto-login uid)
         (html5
           [:head
            [:meta {"charset" "utf-8"}]
            [:meta {"name" "viewport"
                    "content" "width=device-width, initial-scale=1, maximum-scale=1"}]
            (include-css
+             "//cdn.bootcss.com/animate.css/3.5.1/animate.min.css"
              "//cdn.bootcss.com/highlight.js/9.2.0/styles/github-gist.min.css"
              "//cdn.bootcss.com/font-awesome/4.5.0/css/font-awesome.min.css")]
           [:body

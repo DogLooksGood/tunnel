@@ -16,3 +16,20 @@
     {:status :processed
      :tempid tempid}))
 
+(defmethod mutate :stack/publish
+  ;; 发布一个问题
+  [{:keys [uid tempid conn]} key {:keys [title content]}]
+  (let [time (java.util.Date.)
+        stack {:db/id #db/id [:db.part/user]
+               :stack/title title
+               :stack/content content
+               :stack/publish-time time
+               :stack/status :open
+               :stack/agree []
+               :stack/disagree []
+               :stack/author uid}]
+    @(d/transact conn
+       [stack])
+    {:status :processed
+     :tempid tempid}))
+

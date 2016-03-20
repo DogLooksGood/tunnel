@@ -88,5 +88,70 @@
   :db/cardinality :db.cardinality/one
   :db/doc "消息的时间"
   :db.install/_attribute :db.part/db}
+
+ ;; =============================================================================
+ ;; 
+ {:db/id #db/id [:db.part/db]
+  :db/ident :stack/title
+  :db/valueType :db.type/string
+  :db/cardinality :db.cardinality/one
+  :db/doc "问题的标题"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :stack/status
+  :db/valueType :db.type/keyword
+  :db/cardinality :db.cardinality/one
+  :db/doc "问题的状态, 可以是 :open, :close"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :stack/publish-time
+  :db/valueType :db.type/instant
+  :db/cardinality :db.cardinality/one
+  :db/doc "问题发布的时间"
+  :db.install/_attribute :db.part/db}
+ 
+ {:db/id #db/id [:db.part/db]
+  :db/ident :stack/content
+  :db/valueType :db.type/content
+  :db/cardinality :db.cardinality/one
+  :db/doc "问题的内容"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :stack/parent
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "问题的主题, 指向一个问题的entity-id"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :stack/parent
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "问题的主题, 指向一个问题的entity-id"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :stack/author
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/one
+  :db/doc "问题的作者, 指向一个用户的entity-id"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :stack/agree
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/many
+  :db/doc "支持该用户的id"
+  :db.install/_attribute :db.part/db}
+
+ {:db/id #db/id [:db.part/db]
+  :db/ident :stack/disagree
+  :db/valueType :db.type/ref
+  :db/cardinality :db.cardinality/many
+  :db/doc "反对该问题的用户"
+  :db.install/_attribute :db.part/db}
  
  ]

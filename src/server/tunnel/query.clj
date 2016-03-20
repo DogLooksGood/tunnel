@@ -41,3 +41,19 @@
          [$tx-data ?e]
          [?e :message/from]]
     db tx-data sel))
+
+(defmethod query :stack/list-all
+  [{:keys [db]} _ {:keys [sel]}]
+  (->> (d/datoms db
+         :aevt :stack/content)
+    reverse
+    (mapv #(d/pull db sel (:e %)))))
+
+(defmethod tx-query :stack/list-all
+  [{:keys [db tx-data]} _ {:keys [sel]}]
+  (d/q '[:find [(pull ?e sel) ...]
+         :in $ $tx-data sel
+         :where
+         [$tx-data ?e]
+         [?e :stack/content]]
+    db tx-data sel))

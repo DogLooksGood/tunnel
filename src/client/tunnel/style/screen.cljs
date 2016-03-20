@@ -146,6 +146,7 @@
                :border {
                         ;; :top-left-radius (px 5)
                         ;; :bottom-left-radius (px 5)
+                        :style :solid
                         :right-width 0
                         :color grey-600}
                :display :inline-block

@@ -27,8 +27,8 @@
          [:div.header
           [:span "A Chatroom written in pure Clojure ^_^"]
           [:span.icons.pull-right
-           [:i.fa.fa-cogs.btn]
-           [:i.fa.fa-sign-out.btn {:on-click logout}]]]
+           [:i.fa.fa-plus-square-o.btn.fadeInLeft.animated]
+           [:i.fa.fa-sign-out.btn.fadeInLeft.animated {:on-click logout}]]]
          [input-panel]
          [msg-panel]]])}))
 
