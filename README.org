@@ -2,7 +2,8 @@
 ** 前端UI
 前端使用 [[https://github.com/reagent-project/reagent][reagent]].
 
-见 [[file:src/client/tunnel/component/*.cljs]] (此链接仅Emacs/org-mode支持)
+见 [[file:src/client/tunnel/component/*.cljs]] (For Emacs) 
+或 [[file:src/client/tunnel/component]] (For Git Page)
 #+BEGIN_SRC clojure
   (def root
     (r/create-class
@@ -48,7 +49,7 @@
 见 [[file:src/server/tunnel/page.clj]]
 
 ** 通信
-客户端服务器通信使用 [[https://github.com/ptaoussanis/sente][Sente] 提供的websocket. 
+客户端服务器通信使用 [[https://github.com/ptaoussanis/sente][Sente]] 提供的websocket. 
 
 可以模拟http请求的形式, 
 也可以单向的服务器->客户端, 客户端->服务器推送数据.
