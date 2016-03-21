@@ -70,8 +70,8 @@
 
 (defn event-msg-handler*
   [{:keys [event]}]
-  (info (first event) (second event))
-  (event-msg-handler (first event) (second event)))
+  (apply info event)
+  (apply event-msg-handler event))
 
 ;; 用event-msg-handler代替prn, event-msg-handler: (event)
 (sente/start-client-chsk-router! ch-chsk

@@ -28,7 +28,7 @@
         user (service/user-login username password)]
     ;; 如果登陆成功, 给session中添加uid, 作为sente的标识.
     ;; TODO 随机生成的token, 目前没有用. 先放着.
-    ;; 之后redirect到 "/" 
+    ;; 之后redirect到 "/"
     (merge (redirect "/")
       {:session {:uid (:db/id user)
                  :token (gen-token)}})))
@@ -36,7 +36,6 @@
 (defmethod api-handler :logout
   [env _ _]
   (let [{:keys [uid]} env]
-    (debug "LOGOUT" uid)
     (service/user-logout uid)
     (debug "LOGOUT!!!!")
     {:session {}
