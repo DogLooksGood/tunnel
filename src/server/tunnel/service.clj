@@ -1,6 +1,6 @@
 (ns tunnel.service
   (:require [tunnel.db :as db]
-            [taoensso.timbre :refer [trace error]]))
+            [taoensso.timbre :refer [trace error debug]]))
 
 ;; 这个模块需要重构!
 ;; TODO 需要统一返回格式, 这个模块似乎有点多余.
@@ -20,6 +20,7 @@
 
 (defn user-auto-login
   [uid]
+  (debug "user-auto-login" uid)
   (db/mutate {} :user/set-status {:db/id uid :user/status :online}))
 
 (defn user-login
