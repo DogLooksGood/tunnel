@@ -1,8 +1,71 @@
 * 简单的聊天程序 WRITE IN PURE CLOJURE.
-前端使用的reagent.
-后台使用http-kit.
-通信使用sente.
-后台数据库使用的datomic-free.
+** 前端UI
+前端使用 [[https://github.com/reagent-project/reagent][reagent]].
+
+见tunnel/component/*.cljs
+#+BEGIN_SRC clojure
+  (def root
+    (r/create-class
+      {:reagent-render
+       (fn
+         []
+         [:div.container
+          [menu]
+          [:div.content
+           [:div.header
+            [:span "A Chatroom written in pure Clojure ^_^"]
+            [:span.icons.pull-right
+             [:i.fa.fa-plus-square-o.btn.fadeInLeft.animated]
+             [:i.fa.fa-sign-out.btn.fadeInLeft.animated {:on-click logout}]]]
+           [input-panel]
+           [msg-panel]]])}))
+#+END_SRC
+使用EDN的vector格式表示DOM, 代替html语法. 实现从数据到UI的逻辑(render),
+用户行为触发数据的变化, 从来重绘UI.
+
+** 通信
+客户端服务器通信使用 [[https://github.com/ptaoussanis/sente][Sente]] 提供的websocket. 
+
+客户端见 ~socket.cljs~, 服务器见 ~handler.clj~
+
+可以模拟http请求的形式, 
+也可以单向的服务器->客户端, 客户端->服务器推送数据.
+
+** 数据库
+后台数据库使用的 [[http://www.datomic.com/][Datomic]]. 
+#+BEGIN_SRC clojure
+  (defmethod query :message/list-all
+    [{:keys [db]} _ {:keys [sel]}]
+    (->> (d/datoms db
+           :aevt :message/from)
+      reverse
+      (take 30)
+      (mapv #(d/pull db sel (:e %)))))
+
+  (defmethod tx-query :message/list-all
+    [{:keys [db tx-data]} _ {:keys [sel]}]
+    (d/q '[:find [(pull ?e sel) ...]
+           :in $ $tx-data sel
+           :where
+           [$tx-data ?e]
+           [?e :message/from]]
+      db tx-data sel))
+#+END_SRC
+查询写在 ~query.clj~, 修改写在 ~mutate.clj~.
+
+** 代码热加载
+开发环境前端热加载使用 [[https://github.com/bhauman/lein-figwheel][Figwheel]]. 在保存文件的时候, 页面会自动更新.
+开发环境中, Figwheel也兼职为服务器端WebServer.
+
+** 日志
+使用 [[https://github.com/ptaoussanis/timbre][timbre]] 做日志输出.
+
+** 环境集成
+使用 [[https://github.com/danielsz/system][system]] 集成环境. 让开发的时候, 出现无法reloaded的修改时, 
+用 ~reset~ 重启环境.
+
+** 关于CDN
+CDN使用的 [[http://www.bootcdn.cn/][BootCdn]], 简单易用, 开发很方便.
 
 * 开发
 ** 使用 ~cider-jack-in~ 启动REPL
