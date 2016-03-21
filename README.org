@@ -2,8 +2,7 @@
 ** 前端UI
 前端使用 [[https://github.com/reagent-project/reagent][reagent]].
 
-见tunnel/component/*.cljs
-见 [[file:src/client/tunnel/component/*.cljs]]
+见 [[file:src/client/tunnel/component/*.cljs]] (此链接仅Emacs/org-mode支持)
 #+BEGIN_SRC clojure
   (def root
     (r/create-class
