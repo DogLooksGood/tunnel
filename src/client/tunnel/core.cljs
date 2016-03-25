@@ -1,7 +1,6 @@
 (ns tunnel.core
   (:require [tunnel.socket :as socket]  ; 初始化websocket
             [tunnel.style.screen]       ; 加载样式
-            [tunnel.client-utils :as u]
             [tunnel.remote :as remote]
             [tunnel.state :as state]
             [tunnel.register]

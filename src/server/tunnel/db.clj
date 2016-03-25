@@ -195,6 +195,11 @@
 ;; test insert
 (comment
   (with-conn conn
+    (d/q '[:find [(pull ?e [*]) ...]
+           :where [?e :user/username]]
+      (d/db conn)))
+  
+  (with-conn conn
     @(d/transact conn
        [{:db/id #db/id [:db.part/user]
          :user/username "abbb2"

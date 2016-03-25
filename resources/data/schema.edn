@@ -23,10 +23,10 @@
   :db.install/_attribute :db.part/db}
 
  {:db/id #db/id [:db.part/db]
-  :db/ident :user/token
+  :db/ident :user/client-id
   :db/valueType :db.type/string
   :db/cardinality :db.cardinality/one
-  :db/doc "用户登陆的token, 每次登录时系统生成."
+  :db/doc "用户登陆的客户端id, 代表了唯一的一个websocket链接, 每次链接成功都会有新的值."
   :db.install/_attribute :db.part/db}
 
  ;; User Tags

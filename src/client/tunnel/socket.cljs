@@ -19,8 +19,8 @@
 (let [{:keys [chsk ch-recv send-fn state]}
       (sente/make-channel-socket! "/chsk"
         {:type :auto                    ; e/o #{:auto :ajax :ws}
-         :wrap-recv-evs? false          ; 不自动的为服务器推送的数据添加默认event-id
-         })]
+         :wrap-recv-evs? false})]          ; 不自动的为服务器推送的数据添加默认event-id
+
   (def chsk       chsk)
   (def ch-chsk    ch-recv)
   (def chsk-send! send-fn)
@@ -70,10 +70,8 @@
 
 (defn event-msg-handler*
   [{:keys [event]}]
-  (apply info event)
   (apply event-msg-handler event))
 
 ;; 用event-msg-handler代替prn, event-msg-handler: (event)
 (sente/start-client-chsk-router! ch-chsk
   event-msg-handler*)
-

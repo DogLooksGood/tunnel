@@ -1,4 +1,5 @@
 (ns tunnel.api
+  "API模块, 用于处理普通的HTTP请求."
   (:require [tunnel.service :as service]
             [taoensso.timbre :refer [debug spy]]
             [ring.util.response :refer [redirect]]))
@@ -22,17 +23,15 @@
 ;; =============================================================================
 ;; Implement
 
+;; 登陆, 如果登陆成功, session中设置uid. redirect /
 (defmethod api-handler :login
   [env _ params]
   (let [{:keys [username password]} params
         user (service/user-login username password)]
-    ;; 如果登陆成功, 给session中添加uid, 作为sente的标识.
-    ;; TODO 随机生成的token, 目前没有用. 先放着.
-    ;; 之后redirect到 "/"
     (merge (redirect "/")
-      {:session {:uid (:db/id user)
-                 :token (gen-token)}})))
+      {:session {:uid (:db/id user)}})))
 
+;; 退出登陆, 清空session.
 (defmethod api-handler :logout
   [env _ _]
   (let [{:keys [uid]} env]

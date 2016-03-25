@@ -53,8 +53,10 @@
   {:dev
    {:source-paths ["env/dev"]
 
-    :dependencies [[figwheel-sidecar "0.5.0"]]
-
+    :dependencies [[com.cemerick/piggieback "0.2.1"]
+                   [figwheel-sidecar "0.5.0"]]
+    :repl-options 
+    {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
     :plugins [[lein-figwheel "0.5.0-6"]]}
    
    :uberjar

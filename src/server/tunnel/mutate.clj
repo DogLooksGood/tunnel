@@ -2,6 +2,18 @@
   (:require [datomic.api :as d]
             [tunnel.parser :refer [mutate]]))
 
+(defmethod mutate :user/client-register
+  ;; 注册用户的客户端链接.
+  [{:keys [conn uid]} key {:keys [client-id]}]
+  @(d/transact conn
+     [[:db/add uid :user/client-id client-id]]))
+
+(defmethod mutate :user/client-unregister
+  ;; 注销用户的客户端链接.
+  [{:keys [conn uid]} key {:keys [client-id]}]
+  @(d/transact conn
+     [[:db/retract uid :user/client-id client-id]]))
+
 (defmethod mutate :message/send
   ;; 需要处理消息的接受者, 目前先简单的发送给所有人.
   ;; TODO 消息接受者

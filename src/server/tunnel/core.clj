@@ -30,7 +30,6 @@
   (GET "/chsk" req ((-> system :sente :ring-ajax-get-or-ws-handshake) req))
   (POST "/chsk" req ((-> system :sente :ring-ajax-post) req)))
 
-
 ;; =============================================================================
 ;; Handler
 
@@ -39,8 +38,10 @@
                     ;; ring.middleware.session/wrap-session
                     (ring.middleware.defaults/wrap-defaults
                       ring.middleware.defaults/site-defaults)
-                    ring.middleware.stacktrace/wrap-stacktrace
-                    ))
+                    ring.middleware.stacktrace/wrap-stacktrace))
 
 #_(org.httpkit.server/run-server ring-handler
-  {:port 3456})
+   {:port 3456})
+
+
+

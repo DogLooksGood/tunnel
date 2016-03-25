@@ -35,14 +35,14 @@
 
 (defmulti event-msg-handler
   "处理WebSocket的事件"
-  (fn [req uid ev-id ev-msg]
+  (fn [msg ev-id ev-msg]
     ev-id))
 
 (defmethod event-msg-handler :user/command
-  [req uid ev-id {:keys [tempid key params]}]
+  [{:keys [ring-req uid]} ev-id {:keys [tempid key params]}]
   (db/with-conn conn
     (let [send! (-> system :sente :chsk-send!)
-          env {:req req
+          env {:req ring-req
                :uid uid
                :tempid tempid
                :conn conn
@@ -50,10 +50,10 @@
       (parser/mutate env key params))))
 
 (defmethod event-msg-handler :user/fetch
-  [req uid ev-id [key params :as ev-msg]]
+  [{:keys [ring-req uid]} ev-id [key params :as ev-msg]]
   (debug "user/fetch:" ev-msg)
   (db/with-conn-db conn db
-    (let [env {:req req
+    (let [env {:req ring-req
                :uid uid
                :db db
                :conn conn}]
@@ -61,28 +61,42 @@
        :expr ev-msg})))
 
 (defmethod event-msg-handler :user/subscribe
-  [req uid ev-id [key params :as ev-msg]]
+  [{:keys [ring-req uid] :as msg} ev-id [key params :as ev-msg]]
   (debug "user/subscribe:" ev-msg)
   (subs/register-sub uid key params)
-  (event-msg-handler req uid :user/fetch ev-msg))
+  (event-msg-handler msg :user/fetch ev-msg))
 
 (defmethod event-msg-handler :user/unsubscribe
-  [req uid ev-id [key params :as ev-msg]]
+  [{:keys [uid]} ev-id [key params :as ev-msg]]
   (subs/unregister-sub uid key params))
 
+;; WebSocket断开连接.
 (defmethod event-msg-handler :chsk/uidport-close
-  [_ uid _ _]
+  [{:keys [ring-req uid client-id]} _ _]
   (subs/unregister-all-subs uid)
+  (db/with-conn conn
+    (let [env {:req ring-req
+               :uid uid
+               :conn conn}]
+      (parser/mutate env :user/client-unregister {:client-id client-id})))
   (service/user-logout uid))
 
+;; WebSocket连接成功.
+(defmethod event-msg-handler :chsk/uidport-open
+  [{:keys [ring-req uid client-id]} _ _]
+  (db/with-conn conn
+    (let [env {:req ring-req
+               :uid uid
+               :conn conn}]
+      (parser/mutate env :user/client-register {:client-id client-id}))))
+
 (defmethod event-msg-handler :default
-  [req uid ev-id ev-msg]
-  )
+  [msg ev-id ev-msg])
 
 (defn event-msg-handler*
   "入口函数, 简易处理. 如果有?reply-fn就返回响应."
-  [{:keys [event ring-req uid ?reply-fn]}]
+  [{:keys [event ring-req uid ?reply-fn] :as msg}]
   (let [[ev-id ev-msg] event]
-    (let [data (event-msg-handler ring-req uid ev-id ev-msg)]
+    (let [data (event-msg-handler msg ev-id ev-msg)]
       (when ?reply-fn
         (?reply-fn data)))))
