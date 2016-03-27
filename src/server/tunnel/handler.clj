@@ -82,6 +82,7 @@
   (service/user-logout uid))
 
 ;; WebSocket连接成功.
+;; 存储client-id作为当前链接的客户端的标识.
 (defmethod event-msg-handler :chsk/uidport-open
   [{:keys [ring-req uid client-id]} _ _]
   (db/with-conn conn

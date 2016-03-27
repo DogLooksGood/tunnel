@@ -4,15 +4,25 @@
 
 (defmethod mutate :user/client-register
   ;; 注册用户的客户端链接.
+  ;; 同时将用户的在线状态设置为 :online.
   [{:keys [conn uid]} key {:keys [client-id]}]
   @(d/transact conn
-     [[:db/add uid :user/client-id client-id]]))
+     [[:db/add uid :user/client-id client-id]
+      [:db/add uid :user/status :online]]))
 
 (defmethod mutate :user/client-unregister
   ;; 注销用户的客户端链接.
+  ;; 如果当前的client-id和传入的client-id一致, 将client-id取消, 并且设置状态到 :busy.
+  ;; 否则不做任何处理.
   [{:keys [conn uid]} key {:keys [client-id]}]
-  @(d/transact conn
-     [[:db/retract uid :user/client-id client-id]]))
+  (let [old-client-id (d/q '[:find ?v .
+                             :in $ ?e
+                             :where [?e :user/status ?v]]
+                        (d/db conn) uid)]
+    (when (= old-client-id client-id)
+      @(d/transact conn
+        [[:db/retract uid :user/client-id client-id]
+         [:db/add uid :user/status :busy]]))))
 
 (defmethod mutate :message/send
   ;; 需要处理消息的接受者, 目前先简单的发送给所有人.

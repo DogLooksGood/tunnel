@@ -24,17 +24,13 @@
   (db/mutate {} :user/set-status {:db/id uid :user/status :online}))
 
 (defn user-login
-  "用户登陆, 登陆成功返回用户实体, 登陆失败抛出异常.
-  如果登陆成功, 用户的状态会修改为在线 :online"
+  "用户登陆, 登陆成功返回用户信息, 登陆失败抛出异常."
   [username password]
   (if-let [user (db/query :user/login
                   '[:db/id :user/username :user/password]
                   {:user/username username
                    :user/password password})]
-    (do
-      (db/mutate {} :user/set-status (merge user
-                                       {:user/status :online}))
-      user)
+    user
     (throw
       (ex-info
         "Wrong username or password"

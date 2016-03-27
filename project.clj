@@ -7,7 +7,7 @@
   :jvm-opts ^:replace ["-Xms512m" "-Xmx512m" "-server"]
 
   :min-lein-version "2.5.3"
-  
+
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.170"]
                  [org.clojure/core.async "0.2.374"
@@ -27,7 +27,7 @@
                  [secretary "1.2.3"]
                  [datascript "0.15.0"]
                  [com.datomic/datomic-free "0.9.5350"]]
-  
+
   :plugins [[lein-cljsbuild "1.1.2" :exclusions [[org.clojure/clojure]]]
             [lein-externs "0.1.5"]]
 
@@ -55,10 +55,10 @@
 
     :dependencies [[com.cemerick/piggieback "0.2.1"]
                    [figwheel-sidecar "0.5.0"]]
-    :repl-options 
+    :repl-options
     {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
     :plugins [[lein-figwheel "0.5.0-6"]]}
-   
+
    :uberjar
    {:aot :all
 
