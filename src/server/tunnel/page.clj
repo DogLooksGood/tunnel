@@ -1,8 +1,7 @@
 (ns tunnel.page
   "页面"
   (:require [hiccup.page :refer [html5 include-css include-js]]
-            [tunnel.service :as service]
-            [ring.util.response :refer [redirect]]
+            [ring.util.response :as resp :refer [redirect]]
             [ring.util.anti-forgery :refer [anti-forgery-field]]))
 
 ;; =============================================================================
@@ -67,3 +66,15 @@
       [:input {:type :submit :value "登陆"}]
       (anti-forgery-field)]
      [:a {:href "/register"} "注册(测试)"]]))
+
+(defn error-page
+  [req err]
+  (html5
+    [:head
+     [:meta {"charset" "utf-8"}]
+     [:meta {"name" "viewport"
+             "content" "width=device-width, initial-scale=1, maximum-scale=1"}]]
+    [:body
+     [:h3 "发生错误了"]
+     [:p err]
+     [:a {:href "javascript:history.back()"} "返回上一页"]]))

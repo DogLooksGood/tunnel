@@ -1,8 +1,9 @@
 (ns tunnel.api
   "API模块, 用于处理普通的HTTP请求."
-  (:require [tunnel.service :as service]
+  (:require [tunnel.page :as page]
+            [datomic.api :as d]
             [taoensso.timbre :refer [debug spy]]
-            [ring.util.response :refer [redirect]]))
+            [ring.util.response :as resp :refer [redirect]]))
 
 ;; =============================================================================
 ;; Helper
@@ -23,28 +24,35 @@
 ;; =============================================================================
 ;; Implement
 
-;; 登陆, 如果登陆成功, session中设置uid. redirect /
+;; 用户登陆, 如果登陆成功, 跳转/
+;; 如果登陆失败, 打印错误信息
 (defmethod api-handler :login
-  [env _ params]
-  (let [{:keys [username password]} params
-        user (service/user-login username password)]
-    (merge (redirect "/")
-      {:session {:uid (:db/id user)}})))
+  [{:keys [conn]} _ params]
+  (let [{:keys [username password]} params]
+    (if-let [e (d/q '[:find ?e .
+                      :in $ ?username ?password
+                      :where
+                      [?e :user/username ?username]
+                      [?e :user/password ?password]]
+                 (d/db conn) username password)]
+      (merge (redirect "/")
+        {:session {:uid e}})
+      (page/error-page nil "用户名或密码错误"))))
 
-;; 退出登陆, 清空session.
 (defmethod api-handler :logout
-  [env _ _]
-  (let [{:keys [uid]} env]
-    (service/user-logout uid)
-    (debug "LOGOUT!!!!")
-    {:session {}
-     :body "success"}))
+  [{:keys [conn req]} _ params]
+  (let [e (spy (-> req :session :uid))]
+    ;; 清空session
+    (spy (merge (redirect "/")
+           {:session {}}))))
 
 (defmethod api-handler :register
-  [env _ params]
-  (let [{:keys [username password]} params
-        {status :status} (service/user-register username password)]
-    (if (= status :success)
-      (redirect "/login")
-      (redirect "/register"))))
+  ;; 这里有线程安全问题.
+  [{:keys [conn]} _ {:keys [username password]}]
+  @(d/transact conn
+     [{:db/id #db/id [:db.part/user]
+       :user/username username
+       :user/password password
+       :user/status :offline}])
+  (redirect "/login"))
 

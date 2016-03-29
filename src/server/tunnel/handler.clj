@@ -1,6 +1,5 @@
 (ns tunnel.handler
-  (:require [tunnel.service :as service]
-            [tunnel.subs :as subs]
+  (:require [tunnel.subs :as subs]
             [tunnel.db :as db]
             [tunnel.api :as api]
             [tunnel.parser :as parser]
@@ -17,13 +16,13 @@
   TODO 实现异常处理和跳转"
   [ring-req]
   (try
-    (let [params* (:params ring-req)
-          key (keyword (:key params*))
-          params (dissoc params* :key)
-          env {:ring-req ring-req
-               :uid (-> ring-req :session :uid)}]
-      (ctx/with-context ring-req
-        (debug "API Access:" key params)
+    (db/with-conn conn
+      (let [params* (:params ring-req)
+            key (keyword (:key params*))
+            params (dissoc params* :key)
+            env {:req ring-req
+                 :uid (-> ring-req :session :uid)
+                 :conn conn}]
         (api/api-handler env key params)))
     (catch clojure.lang.ExceptionInfo ex
       {:body (.getMessage ex)
@@ -78,8 +77,7 @@
     (let [env {:req ring-req
                :uid uid
                :conn conn}]
-      (parser/mutate env :user/client-unregister {:client-id client-id})))
-  (service/user-logout uid))
+      (parser/mutate env :user/client-unregister {:client-id client-id}))))
 
 ;; WebSocket连接成功.
 ;; 存储client-id作为当前链接的客户端的标识.
